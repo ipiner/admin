@@ -1,5 +1,5 @@
 {
-    "name": "pin/admin",
+    "name": "ipiner/admin",
     "type": "project",
     "description": "基于 Pin 开发的极简后台管理系统 API 示例",
     "keywords": ["framework", "laravel", "pin", "admin"],
@@ -46,7 +46,11 @@
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
         "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php -r \"file_put_contents('.env', PHP_EOL.'CRYPT_KEY='.substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),0,16).PHP_EOL.'CRYPT_IV='.substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'),0,16).PHP_EOL, FILE_APPEND);\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
         ]
     },
     "config": {
