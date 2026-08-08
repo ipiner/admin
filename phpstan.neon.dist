@@ -1,0 +1,7 @@
+parameters:
+    level: 1
+    paths:
+        - app
+    ignoreErrors:
+        - '#Access to an undefined property#'
+        - '#Unsafe usage of new static#'
