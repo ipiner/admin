@@ -7,7 +7,7 @@ namespace App\Modules\System\Role\Actions;
 use App\Models\System\Role;
 use App\Modules\System\Role\MenusMustExistRule;
 use App\Modules\System\Role\RoleService;
-use Pin\Actions\Action;
+use Pin\Action\Action;
 use Pin\Validation\Rules\Unique;
 
 /**

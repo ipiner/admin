@@ -7,7 +7,7 @@ namespace App\Modules\Auth;
 use App\Errors\Errors;
 use App\Models\System\Admin;
 use Illuminate\Support\Arr;
-use Pin\Actions\Action;
+use Pin\Action\Action;
 use Pin\Captcha\Captcha;
 use Pin\Support\Facades\Password;
 

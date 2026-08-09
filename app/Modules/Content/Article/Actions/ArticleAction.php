@@ -9,7 +9,7 @@ use App\Modules\Content\Article\CategoryMustExistRule;
 use App\Modules\Content\Models\Article;
 use App\Modules\Content\Models\ArticleCategory;
 use Illuminate\Support\Arr;
-use Pin\Actions\Action;
+use Pin\Action\Action;
 use Pin\Faker\Fake;
 use Pin\Validation\Rules\Unique;
 

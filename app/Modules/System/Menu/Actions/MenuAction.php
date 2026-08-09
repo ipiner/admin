@@ -8,7 +8,7 @@ use App\Models\System\Menu;
 use App\Modules\System\Menu\MenuService;
 use Illuminate\Support\Str;
 use Pin\Faker\Fake;
-use Pin\Tree\Actions\Action;
+use Pin\Tree\Action;
 use Pin\Validation\Rules\Unique;
 
 /**
