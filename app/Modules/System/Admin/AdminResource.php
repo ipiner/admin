@@ -32,6 +32,7 @@ class AdminResource extends JsonResource
                  */
                 'roles' => $this->getRoles($this->resource->roles),
                 'super' => $this->isAdministrator(),
+                'has_all_access' => $this->hasAllAccess(),
             ]
         );
     }
