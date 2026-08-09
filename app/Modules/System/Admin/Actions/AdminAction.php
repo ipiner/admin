@@ -7,7 +7,7 @@ namespace App\Modules\System\Admin\Actions;
 use App\Models\System\Admin;
 use App\Modules\System\Admin\AdminService;
 use App\Modules\System\Admin\RoleAssignableRule;
-use Pin\Actions\Action;
+use Pin\Action\Action;
 use Pin\Captcha\Rule;
 use Pin\Validation\Rules\Unique;
 

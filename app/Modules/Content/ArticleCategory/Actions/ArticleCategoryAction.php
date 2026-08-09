@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Content\ArticleCategory\Actions;
 
 use App\Modules\Content\ArticleCategory\ArticleCategoryService;
-use Pin\Tree\Actions\Action;
+use Pin\Tree\Action;
 
 /**
  * 分类创建和更新动作共享的验证规则。

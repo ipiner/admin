@@ -11,7 +11,7 @@ use App\Routes\System\MenuRoute;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Pin\Access\Attributes\Access;
-use Pin\Actions\Action;
+use Pin\Action\Action;
 use Pin\Captcha\CaptchaRoute;
 use Pin\Route\RouteRegistry;
 use Pin\Route\RouteRegistryItem;
