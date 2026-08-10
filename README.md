@@ -31,3 +31,9 @@ DEFAULT_DB_PASSWORD=
 php artisan migrate --seed
 ```
 
+### 演示
+
+- URL：https://admin.ipiner.cn
+- 帐号：test-admin
+- 密码：test@123
+- 验证码：倒序
