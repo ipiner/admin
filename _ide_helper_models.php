@@ -39,7 +39,7 @@ namespace App\Models\System{
  * @property string|null $last_login_at 最后登录时间
  * @property string $last_login_ip 最后登录ip
  * @property int $v 数据版本号
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $created_at 添加时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property int $deleted_at 删除时间戳
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\System\Role> $roles
@@ -87,7 +87,7 @@ namespace App\Models\System{
  * @property string $icon icon图标
  * @property string $route 前端路由地址
  * @property int $v 数据版本号
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $created_at 添加时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property int $deleted_at 删除时间戳
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Menu> $children
@@ -129,7 +129,7 @@ namespace App\Models\System{
  * @property string $name 角色名称
  * @property string $remark 备注
  * @property int $v 数据版本号
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $created_at 添加时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property int $deleted_at 删除时间戳
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\System\Menu> $menus
@@ -158,7 +158,7 @@ namespace App\Models\System{
  * @property int $id id|自增
  * @property int $role_id 角色id|roles.id
  * @property int $menu_id 菜单id|menus.id
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $created_at 添加时间
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleMenu newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleMenu newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RoleMenu query()
@@ -193,7 +193,7 @@ namespace App\Models{
  * @property int $height 图片高
  * @property string $ip 用户ip
  * @property array<array-key, mixed>|null $info 其它信息
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $created_at 添加时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property int $deleted_at 删除时间戳
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Upload newModelQuery()
@@ -246,7 +246,7 @@ namespace App\Models{
  * @property string $message 返回信息
  * @property string $ip 用户ip
  * @property array<array-key, mixed>|null $info 其它信息
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $created_at 添加时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UploadLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UploadLog newQuery()
@@ -289,7 +289,7 @@ namespace App\Modules\Content\Models{
  * @property int $v 数据版本号
  * @property int $created_by 创建用户id
  * @property int $updated_by 更新用户id
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $created_at 添加时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property int $deleted_at 删除时间戳
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Article newModelQuery()
@@ -327,7 +327,7 @@ namespace App\Modules\Content\Models{
  * @property int $v 数据版本号
  * @property int $created_by 创建用户id
  * @property int $updated_by 更新用户id
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $created_at 添加时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property int $deleted_at 删除时间戳
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Modules\Content\Models\Article> $articles
