@@ -47,7 +47,7 @@ class AdminController extends Controller
     /**
      * 管理员列表
      *
-     * @return ApiResponse<Pagination<AdminResource[]>>
+     * @return ApiResponse<Pagination<AdminResource>>
      */
     public function index(Request $request): ApiResponse
     {

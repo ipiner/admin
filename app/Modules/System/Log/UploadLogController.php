@@ -23,7 +23,7 @@ class UploadLogController extends Controller
     /**
      * 上传日志
      *
-     * @return ApiResponse<Pagination<UploadLog[]>>
+     * @return ApiResponse<Pagination<UploadLog>>
      */
     public function index(Request $request): ApiResponse
     {
