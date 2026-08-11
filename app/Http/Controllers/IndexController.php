@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 
 use Dedoc\Scramble\Attributes\ExcludeAllRoutesFromDocs;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Pin\Http\ApiResponse;
 
 /**
@@ -28,8 +27,6 @@ class IndexController extends Controller
      */
     public function fallback(Request $request): ApiResponse
     {
-        Log::warning('Page Not Found: /'.trim($request->path(), '/'));
-
         return $this->error(404, 'Page Not Found')->withStatusCode(404);
     }
 
