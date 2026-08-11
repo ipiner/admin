@@ -41,15 +41,11 @@ trait HasValidation
             /**
              * 密码（加密传输）
              *
-             * 非生产环境下可以使用 `plain:123456` 格式的明文密码
-             *
              * @example plain:123456
              */
             'password' => 'required|fake:password',
             /**
              * 验证码，格式 `input.token`
-             *
-             * 非生产环境下可以使用 `plain:a|a` 格式的验证码
              *
              * @example plain:a|a
              */

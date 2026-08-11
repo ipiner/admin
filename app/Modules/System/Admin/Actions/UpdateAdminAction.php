@@ -51,11 +51,7 @@ class UpdateAdminAction extends AdminAction
         return [
             ...$this->basicRules(),
 
-            /**
-             * 密码（加密传输），不修改密码留空
-             *
-             * 非生产环境下可以使用 `plain:123456` 格式的明文密码
-             */
+            // 密码（加密传输），不修改密码留空
             'password' => 'nullable:50|fake:password',
 
             // 数据版本号
