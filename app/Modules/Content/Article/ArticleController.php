@@ -50,7 +50,7 @@ class ArticleController extends Controller
     /**
      * 文章列表
      *
-     * @return ApiResponse<Pagination<ArticleResource[]>>
+     * @return ApiResponse<Pagination<ArticleResource>>
      */
     public function index(Request $request, ArticleService $service): ApiResponse
     {

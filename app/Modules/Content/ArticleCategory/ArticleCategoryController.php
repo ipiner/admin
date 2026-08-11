@@ -51,7 +51,7 @@ class ArticleCategoryController extends Controller
     /**
      * 分类列表
      *
-     * @return ApiResponse<Pagination<ArticleCategory[]>>
+     * @return ApiResponse<Pagination<ArticleCategory>>
      */
     public function index(Request $request, ArticleCategoryService $service): ApiResponse
     {

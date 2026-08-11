@@ -46,7 +46,7 @@ class RoleController extends Controller
     /**
      * 角色列表
      *
-     * @return ApiResponse<Pagination<RoleResource[]>>
+     * @return ApiResponse<Pagination<RoleResource>>
      */
     public function index(): ApiResponse
     {

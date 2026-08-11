@@ -55,7 +55,7 @@ class MenuController extends Controller
     /**
      * 菜单列表
      *
-     * @return ApiResponse<Pagination<Menu[]>>
+     * @return ApiResponse<Pagination<Menu>>
      */
     public function index(Request $request, MenuService $service): ApiResponse
     {
