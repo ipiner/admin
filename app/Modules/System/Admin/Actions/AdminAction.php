@@ -41,8 +41,6 @@ class AdminAction extends Action
             /**
              * 密码（加密传输）
              *
-             * 非生产环境下可以使用 `plain:123456` 格式的明文密码
-             *
              * @example plain:123456
              */
             'password' => 'required|fake:password',
