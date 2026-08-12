@@ -8,7 +8,8 @@ use Pin\Application;
 return Application::configure(dirname(__DIR__))
     ->withExceptions(Handler::class)
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->trustProxies('*')
+        $middleware->throttleApi('api', true)
+            ->trustProxies('*')
             ->appendToGroup('api', DemoGuard::class);
     })
     ->create();
