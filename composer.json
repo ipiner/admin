@@ -11,6 +11,7 @@
         "ipiner/modules-log": "^1.0",
         "ipiner/pin": "^1.0",
         "ipiner/upload": "^1.0",
+        "laravel/octane": "^2.19",
         "laravel/tinker": "^3.0"
     },
     "require-dev": {
