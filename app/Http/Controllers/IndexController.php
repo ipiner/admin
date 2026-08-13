@@ -15,14 +15,6 @@ use Pin\Http\ApiResponse;
 class IndexController extends Controller
 {
     /**
-     * 预热 CSRF Cookie 的空响应接口。
-     */
-    public function csrf(): ApiResponse
-    {
-        return $this->success();
-    }
-
-    /**
      * API fallback 入口，记录未命中的请求路径。
      */
     public function fallback(Request $request): ApiResponse
@@ -31,14 +23,10 @@ class IndexController extends Controller
     }
 
     /**
-     * 健康检查接口，可按需返回请求头用于调试。
+     * API 首页
      */
     public function index(Request $request): ApiResponse
     {
-        $data = $request->query('headers') === 'with-headers'
-            ? ['headers' => $request->header()]
-            : [];
-
-        return $this->success($data);
+        return $this->success();
     }
 }
