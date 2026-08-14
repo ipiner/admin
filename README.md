@@ -10,9 +10,7 @@
 - API 文档生成
 
 <div>
-  <a href="https://admin.ipiner.cn/api" target="_blank">
     <img alt="Api Docs" width="100%" src="https://admin.ipiner.cn/api/scalar.png">
-  </a>
 </div>
 
 ## 快速开始
@@ -49,3 +47,6 @@ http://your-domain/docs/api
 - 帐号：test-admin
 - 密码：test@123
 - 验证码：倒序输入
+
+## 在线 API 文档
+[https://admin.ipiner.cn/api](https://admin.ipiner.cn/api)
