@@ -10,6 +10,9 @@ return Application::configure(dirname(__DIR__))
     ->withExceptions(Handler::class, function (Exceptions $exceptions) {
         $exceptions->shouldRenderJsonWhen(fn () => true);
     })
+    ->withEvents([
+        __DIR__.'/../app/Listeners',
+    ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->throttleApi('api', true)
             ->trustProxies('*')
