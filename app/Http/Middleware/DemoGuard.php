@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Errors\Errors;
+use App\Events\LoginFailed;
 use App\Exceptions\Exception;
 use App\Models\System\Admin;
 use App\Models\System\Menu;
@@ -46,6 +48,12 @@ class DemoGuard
             $request->json('username') === 'admin'
             && $request->cookie('admin_login_token') !== '1'
         ) {
+            event(new LoginFailed(
+                Admin::find(1),
+                Errors::LoginDisabled->code(),
+                '禁止登录该用户',
+                Errors::LoginDisabled->code(),
+            ));
             $this->throws('禁止登录该用户');
         }
     }

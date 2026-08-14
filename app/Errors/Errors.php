@@ -58,4 +58,8 @@ enum Errors: string implements IError
      * 登录失败：密码错误（用于日志）
      */
     case LoginPasswordMismatch = '21002|帐号或密码错误';
+    /**
+     * 登录失败：禁止登录
+     */
+    case LoginDisabled = '21003|禁止登录';
 }
