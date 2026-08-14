@@ -8,6 +8,7 @@ use App\Exceptions\Exception;
 use App\Models\System\Admin;
 use App\Models\System\Menu;
 use App\Routes\AccountRoute;
+use App\Routes\Auth\LoginRoute;
 use App\Routes\System\AdminRoute;
 use App\Routes\System\MenuRoute;
 use Closure;
@@ -24,11 +25,29 @@ class DemoGuard
             return $next($request);
         }
 
+        $this->handleAdminLogin($request);
         $this->handleCreate($request);
         $this->handleDelete($request);
         $this->handleUpdate($request);
 
         return $next($request);
+    }
+
+    /**
+     * 处理 `admin` 用户登录
+     */
+    protected function handleAdminLogin(Request $request): void
+    {
+        if (! $request->isRequest(LoginRoute::Login->name())) {
+            return;
+        }
+
+        if (
+            $request->json('username') === 'admin'
+            && $request->cookie('admin_login_token') !== '1'
+        ) {
+            $this->throws('禁止登录该用户');
+        }
     }
 
     /*
