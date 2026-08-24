@@ -54,7 +54,7 @@ class DemoGuard
                 Errors::LoginDisabled->message(),
                 Errors::LoginDisabled->code(),
             ));
-            $this->throws(Errors::LoginDisabled->message());
+            $this->throws(Errors::LoginDisabled->message(), false);
         }
     }
 
@@ -197,9 +197,9 @@ class DemoGuard
     /**
      * 抛异常
      */
-    protected function throws(string $message): never
+    protected function throws(string $message, bool $withPrefix = true): never
     {
-        throw new Exception('演示环境'.$message, 403)
+        throw new Exception(($withPrefix ? '演示环境' : '').$message, 403)
             ->withStatusCode(403);
     }
 }
