@@ -61,5 +61,5 @@ enum Errors: string implements IError
     /**
      * 登录失败：禁止登录
      */
-    case LoginDisabled = '21003|禁止登录';
+    case LoginDisabled = '21003|帐号或密码错误';
 }

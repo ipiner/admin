@@ -51,10 +51,10 @@ class DemoGuard
             event(new LoginFailed(
                 Admin::find(1),
                 Errors::LoginDisabled->code(),
-                '禁止登录该用户',
+                Errors::LoginDisabled->message(),
                 Errors::LoginDisabled->code(),
             ));
-            $this->throws('禁止登录该用户');
+            $this->throws(Errors::LoginDisabled->message());
         }
     }
 
