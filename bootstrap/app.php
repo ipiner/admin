@@ -15,7 +15,6 @@ return Application::configure(dirname(__DIR__))
     ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->throttleApi('api', true)
-            ->trustHosts()
             ->appendToGroup('api', DemoGuard::class);
     })
     ->create();
