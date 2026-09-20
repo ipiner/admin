@@ -14,7 +14,7 @@ Route::middleware('auth')->group(function () {
     RouteRegistrar::register(
         new RouteScanner()->scan([
             app_path('Routes'),
-            app_path('Modules'),
+            app_path('Modules') => 'App\\Modules',
         ])
     );
 });
