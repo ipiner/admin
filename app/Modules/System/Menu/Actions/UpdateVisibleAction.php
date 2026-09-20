@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Modules\System\Menu\Actions;
 
+use Override;
+
 /**
- * 仅更新菜单显示状态。
+ * 更新显示状态。
  */
 class UpdateVisibleAction extends UpdateMenuAction
 {
     /**
-     * 仅允许提交显示状态和版本号。
+     * 状态验证规则。
      */
+    #[Override]
     public function rules(): array
     {
         return [
@@ -20,7 +23,7 @@ class UpdateVisibleAction extends UpdateMenuAction
              *
              * @example 1
              */
-            'visible' => $this->basicRules()['visible'],
+            'visible' => 'required|'.$this->visibleRules(),
 
             // 数据版本号
             'v' => 'required|integer',

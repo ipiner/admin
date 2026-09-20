@@ -9,42 +9,44 @@ use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 
 /**
- * 带限流和去重中间件的异常邮件队列任务。
+ * 异常邮件队列。
  */
 class MailQueue extends Mail implements ShouldQueue
 {
     /**
      * 每个异常消息每分钟最多发送一次。
      */
-    public const LIMIT_1_M = 'mail:1/m';
+    public const string LIMIT_1_M = 'mail:1/m';
 
     /**
-     * 队列去重锁 key。
+     * 去重锁键。
      */
     public string $overlappingKey;
 
     /**
-     * Laravel RateLimiter 名称。
+     * 限流器名称。
      */
     public string $limiterName;
 
     /**
-     * 限流分组 key。
+     * 限流分组键。
      */
     public string $limitBy;
 
     /**
-     * {@inheritdoc}
+     * @param  array<string, mixed>  $log  日志内容
      */
-    public function __construct(public array $log)
+    public function __construct(array $log)
     {
         parent::__construct($log);
-        $this->setOverlappingKey($messageId = md5($log['message']));
-        $this->setLimit(static::LIMIT_1_M, $messageId);
+
+        $messageKey = md5($log['message']);
+        $this->setOverlappingKey($messageKey);
+        $this->setLimit(static::LIMIT_1_M, $messageKey);
     }
 
     /**
-     * 返回队列限流使用的业务维度。
+     * 获取限流分组键。
      */
     public function getLimitBy(): string
     {
@@ -52,25 +54,20 @@ class MailQueue extends Mail implements ShouldQueue
     }
 
     /**
-     * 生成队列限流和去重中间件。
+     * 队列去重与限流。
+     *
+     * @return list<WithoutOverlapping|RateLimitedWithRedis>
      */
     public function middleware(): array
     {
-        $middlewares = [];
-
-        if (isset($this->overlappingKey)) {
-            $middlewares[] = (new WithoutOverlapping($this->overlappingKey))->dontRelease();
-        }
-
-        if (isset($this->limiterName)) {
-            $middlewares[] = (new RateLimitedWithRedis($this->limiterName))->dontRelease();
-        }
-
-        return $middlewares;
+        return [
+            new WithoutOverlapping($this->overlappingKey)->dontRelease(),
+            new RateLimitedWithRedis($this->limiterName)->dontRelease(),
+        ];
     }
 
     /**
-     * @return $this
+     * 设置限流规则。
      */
     public function setLimit(string $limiterName, string $limitBy = ''): static
     {
@@ -81,7 +78,7 @@ class MailQueue extends Mail implements ShouldQueue
     }
 
     /**
-     * @return $this
+     * 设置去重锁键。
      */
     public function setOverlappingKey(string $overlappingKey): static
     {

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Upload\IdeHelperUploadLog;
-
 /**
+ * 上传日志。
+ *
  * @mixin IdeHelperUploadLog
  */
 class UploadLog extends Model

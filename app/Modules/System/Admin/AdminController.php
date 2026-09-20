@@ -18,7 +18,7 @@ use Pin\Scramble\Deleted;
 use Pin\Scramble\Updated;
 
 /**
- * 管理员账号管理接口。
+ * 管理员管理。
  */
 #[Group('系统 / 管理员')]
 class AdminController extends Controller
@@ -51,15 +51,14 @@ class AdminController extends Controller
      */
     public function index(Request $request): ApiResponse
     {
-        $rules = [
+        $request->validate([
             /**
              * 关键字，支持查询 `id` / `用户名` / `姓名`
              *
              * @example 1 / admin / 系统管理员
              */
             'q' => 'nullable|string',
-        ];
-        $request->validate($rules);
+        ]);
         $data = Admin::orderBy('id')->queryable(['q' => 'ns:id|username|realname'])
             ->with('roles')
             ->pagination()
@@ -85,21 +84,23 @@ class AdminController extends Controller
      * @param  int  $id  管理员id
      * @return ApiResponse<Updated>
      */
-    public function updateAvatar(Request $request, AdminService $service, int $id): ApiResponse
-    {
-        if (! $request->files->get('file')) {
-            return $this->success($service->update($id, ['avatar' => '']));
-        }
-
-        // 这里专给scramble解析body用，真正验证在Upload中
+    public function updateAvatar(
+        Request $request,
+        AdminService $service,
+        UploadService $upload,
+        int $id
+    ): ApiResponse {
         $request->validate([
             // 头像文件
-            'file' => 'file',
+            'file' => 'nullable|file',
         ]);
 
+        $admin = Admin::findOrFail($id);
+        AdminGuard::ensureUpdatable($admin);
+
         return $this->success($service->update(
-            $id,
-            ['avatar' => new UploadService()->upload($request)->url()]
+            $admin,
+            ['avatar' => $request->hasFile('file') ? $upload->upload($request)->url() : '']
         ));
     }
 }

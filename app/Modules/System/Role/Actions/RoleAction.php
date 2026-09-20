@@ -11,29 +11,27 @@ use Pin\Action\Action;
 use Pin\Validation\Rules\Unique;
 
 /**
- * 角色创建和更新动作共享的验证规则。
+ * 角色写入操作。
  */
 class RoleAction extends Action
 {
-    /**
-     * 注入角色写入服务
-     */
-    public function __construct(protected RoleService $service)
+    public function __construct(protected RoleService $service = new RoleService())
     {
     }
 
     /**
-     * 角色创建和更新共享的基础验证规则。
+     * 基础验证规则。
      */
     protected function basicRules(): array
     {
         return [
             // 角色名称
             'name' => [
+                'bail',
                 'required',
                 'string',
                 'unique' => new Unique(Role::class)->ignore(
-                    (int) $this->context->get('id')
+                    (int) $this->context('id')
                 ),
             ],
 
@@ -46,6 +44,7 @@ class RoleAction extends Action
              * @example []
              */
             'menus' => [
+                'bail',
                 'nullable',
                 'array',
                 new MenusMustExistRule(),
@@ -55,13 +54,13 @@ class RoleAction extends Action
     }
 
     /**
-     * 从写入数据中剥离菜单字段，超级角色不通过表单维护菜单权限。
+     * 提取菜单 ID。
      */
-    protected function extractMenuIds(array &$data, bool $isSuper = false): array
+    protected function extractMenuIds(array &$data): array
     {
         $menuIds = $data['menus'] ?? [];
         unset($data['menus']);
 
-        return $isSuper ? [] : $menuIds;
+        return array_values(array_unique($menuIds));
     }
 }

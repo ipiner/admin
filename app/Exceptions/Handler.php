@@ -6,26 +6,26 @@ namespace App\Exceptions;
 
 use App\Mail\Mail;
 use Override;
-use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Throwable;
 
 /**
- * 全局异常处理器
+ * 全局异常处理器。
  */
 class Handler extends \Pin\Exceptions\Handler
 {
     /**
-     * 上报异常
+     * 记录异常并发送邮件。
      */
     #[Override]
-    public function report(Throwable $e)
+    protected function reportThrowable(Throwable $e): void
     {
-        parent::report($e);
+        parent::reportThrowable($e);
         $this->reportedThrowable($e);
     }
 
     /**
-     * 发送异常邮件
+     * 发送异常邮件。
      */
     protected function mailThrowable(Throwable $e): Mail|false
     {
@@ -33,7 +33,7 @@ class Handler extends \Pin\Exceptions\Handler
     }
 
     /**
-     * 上报异常后置操作
+     * 处理异常通知。
      */
     protected function reportedThrowable(Throwable $e): Mail|false
     {
@@ -45,14 +45,10 @@ class Handler extends \Pin\Exceptions\Handler
     }
 
     /**
-     * 是否需要发送异常邮件
+     * 是否发送异常邮件。
      */
     protected function shouldMail(Throwable $e): bool
     {
-        if ($this->shouldntReport($e) || $e instanceof TransportException) {
-            return false;
-        }
-
-        return true;
+        return ! $e instanceof TransportExceptionInterface;
     }
 }

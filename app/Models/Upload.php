@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Support\Arr;
 use Pin\Log\Payload;
 use Pin\Upload\UploadedFile;
 
 /**
- * 上传文件主表模型。
+ * 上传文件。
  *
  * @mixin IdeHelperUpload
  */
@@ -21,65 +22,78 @@ class Upload extends Model
     ];
 
     /**
-     * 根据上传文件对象创建主记录和上传日志。
+     * 保存上传记录和日志。
      */
     public static function createFromUploadedFile(UploadedFile $file): void
     {
-        static::createUploadLogs($file, static::createUpload($file));
+        $data = static::uploadData($file);
+
+        if (! $data['info']['errors']) {
+            $data['url'] = $file->url();
+            static::create($data);
+        }
+
+        static::createUploadLog($data);
     }
 
     /**
-     * 生成上传记录数据；上传失败时只返回数据用于写日志。
+     * 生成上传数据。
+     *
+     * @return array<string, mixed>
      */
-    protected static function createUpload(UploadedFile $file): array
+    protected static function uploadData(UploadedFile $file): array
     {
         $payload = new Payload();
-        $errors = $file->getErrors();
 
-        $data = [
+        return [
             'file_id' => $file->file_id,
             'name' => $file->original['name'],
             'original_name' => $file->original['name'],
             'path' => $file->path,
             'extension' => $file->extension,
-            'mime_type' => $file->mime_type,
+            'mime_type' => $file->mime_type ?? '',
             'width' => (int) $file->width,
             'height' => (int) $file->height,
             'size' => $file->size,
-            'info' => [
-                'original' => $file->original,
-                'thumb' => $file->thumb,
-                'water' => $file->water,
-                'errors' => $errors,
-            ],
+            'info' => static::uploadInfo($file),
             'disk' => $file->disk ?: '',
             'uid' => $payload->uid,
             'username' => $payload->username,
             'user_type' => $payload->user_type,
             'ip' => $payload->ip,
         ];
-
-        unset($data['info']['thumb']['pathname'], $data['info']['water']['pathname']);
-
-        if (! $file->errors) {
-            $data['url'] = $file->url();
-            static::create($data);
-        }
-
-        return $data;
     }
 
     /**
-     * 记录上传结果，成功 code 为 0，失败使用首个错误码。
+     * 整理文件信息。
+     *
+     * @return array<string, mixed>
      */
-    protected static function createUploadLogs(UploadedFile $file, array $data): UploadLog
+    protected static function uploadInfo(UploadedFile $file): array
     {
-        return UploadLog::create(array_merge(
-            $data,
-            [
-                'code' => $file->errors ? array_key_first($data['info']['errors']) : 0,
-                'message' => $file->errors ? array_first($data['info']['errors']) : '上传成功',
-            ]
-        ));
+        return [
+            'original' => $file->original,
+            'thumb' => $file->thumb
+                ? array_map(fn (array $thumb) => Arr::except($thumb, 'pathname'), $file->thumb)
+                : $file->thumb,
+            'water' => $file->water ? Arr::except($file->water, 'pathname') : $file->water,
+            'errors' => $file->getErrors(),
+        ];
+    }
+
+    /**
+     * 记录上传结果。
+     *
+     * @param  array<string, mixed>  $data
+     */
+    protected static function createUploadLog(array $data): UploadLog
+    {
+        $errors = $data['info']['errors'];
+
+        return UploadLog::create([
+            ...$data,
+            'code' => $errors ? array_key_first($errors) : 0,
+            'message' => $errors ? array_first($errors) : '上传成功',
+        ]);
     }
 }

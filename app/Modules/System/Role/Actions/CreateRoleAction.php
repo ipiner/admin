@@ -9,12 +9,12 @@ use App\Models\System\Role;
 use Pin\Services\Results\CreateResult;
 
 /**
- * 创建角色并挂载初始菜单权限。
+ * 创建角色。
  */
 class CreateRoleAction extends RoleAction
 {
     /**
-     * 执行角色创建流程。
+     * 创建角色。
      */
     public function handle(): CreateResult
     {
@@ -23,30 +23,30 @@ class CreateRoleAction extends RoleAction
 
         return $this->service->create(
             $data,
-            fn (Role $item) => $this->attachMenus($item, $menuIds),
+            fn (Role $role) => $this->attachMenus($role, $menuIds),
         );
     }
 
     /**
-     * 创建后挂载菜单权限，并补充操作日志变更内容。
+     * 分配菜单。
      */
-    protected function attachMenus(Role $item, array $menuIds): void
+    protected function attachMenus(Role $role, array $menuIds): void
     {
         if (! $menuIds) {
             return;
         }
 
-        $item->menus()->attach($menuIds);
+        $role->menus()->attach($menuIds);
         $menus = Menu::findMany($menuIds)->sortBy('id')->pluck('name')->join("\n");
-        $item->mergeOperationChanges([], ['menus' => "\n".$menus."\n"]);
+        $role->mergeOperationChanges([], ['menus' => "\n".$menus."\n"]);
     }
 
     /**
-     * 创建角色请求验证规则。
+     * 创建验证规则。
      */
-    protected function rules(): array
+    public function rules(): array
     {
-        // ...展开，Scramble可识别
+        // 展开规则供 Scramble 解析。
         return [...$this->basicRules()];
     }
 }

@@ -9,32 +9,30 @@ use Pin\Errors\Errors;
 use Pin\Exceptions\Exception;
 
 /**
- * 角色守卫
- *
- * 角色业务相关的权限约束和特殊角色保护逻辑
+ * 角色操作权限。
  */
 class RoleGuard
 {
     /**
-     * 角色是否允许被更新
+     * 检查修改权限。
      *
      * @throws Exception
      */
-    public static function ensureUpdatable(Role $model): void
+    public static function ensureUpdatable(Role $role): void
     {
-        if ($model->isSuperRole() && ! auth()->user()->isAdministrator()) {
+        if ($role->isSuperRole() && ! auth()->user()->isAdministrator()) {
             throw Errors::UpdateFailed->exception('禁止修改该角色')->withStatusCode(403);
         }
     }
 
     /**
-     * 角色是否允许被删除
+     * 检查删除权限。
      *
      * @throws Exception
      */
-    public static function ensureDeletable(Role $model): void
+    public static function ensureDeletable(Role $role): void
     {
-        if ($model->isSuperRole()) {
+        if ($role->isSuperRole()) {
             throw Errors::DeleteFailed->exception('禁止删除该角色')->withStatusCode(403);
         }
     }

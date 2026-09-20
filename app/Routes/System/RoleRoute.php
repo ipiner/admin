@@ -9,7 +9,7 @@ use Pin\Route\Attributes\Title;
 use Pin\Route\Routable;
 
 /**
- * 角色管理接口路由枚举。
+ * 角色路由。
  */
 enum RoleRoute: string implements Routable
 {

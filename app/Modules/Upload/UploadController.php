@@ -8,7 +8,11 @@ use App\Http\Controllers\Controller;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
 use Pin\Http\ApiResponse;
+use Pin\Upload\UploadedFile;
 
+/**
+ * 上传接口。
+ */
 #[Group('上传')]
 class UploadController extends Controller
 {
@@ -19,14 +23,15 @@ class UploadController extends Controller
      */
     public function image(Request $request, UploadService $service): ApiResponse
     {
-        // 这里专给scramble解析body用，真正验证在Upload中
         $request->validate([
             // 图片文件
-            'file' => 'file',
+            'file' => 'required|file',
         ]);
 
-        $file = $service->upload($request);
-        $file->thumb(true, 'l');
+        $file = $service->upload(
+            $request,
+            beforeStore: static fn (UploadedFile $file) => $file->thumb(true, 'l'),
+        );
 
         return $this->success(['url' => $file->url()], '上传成功');
     }

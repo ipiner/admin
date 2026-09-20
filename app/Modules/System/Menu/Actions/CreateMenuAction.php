@@ -7,12 +7,12 @@ namespace App\Modules\System\Menu\Actions;
 use Pin\Services\Results\CreateResult;
 
 /**
- * 创建菜单节点。
+ * 创建菜单。
  */
 class CreateMenuAction extends MenuAction
 {
     /**
-     * 执行菜单创建流程。
+     * 创建菜单。
      */
     public function handle(): CreateResult
     {
@@ -20,13 +20,11 @@ class CreateMenuAction extends MenuAction
     }
 
     /**
-     * 创建菜单请求验证规则。
+     * 创建验证规则。
      */
-    protected function rules(): array
+    public function rules(): array
     {
-        // ...展开，Scramble可识别
-        return [
-            ...$this->basicRules(),
-        ];
+        // 展开规则供 Scramble 解析。
+        return [...$this->basicRules()];
     }
 }

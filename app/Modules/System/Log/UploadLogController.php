@@ -7,15 +7,18 @@ namespace App\Modules\System\Log;
 use App\Models\UploadLog;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Override;
 use Pin\Errors\Errors;
 use Pin\Http\ApiResponse;
 use Pin\Modules\Log\Controllers\Controller;
 use Pin\Pagination\Pagination;
-use Pin\Validation\QueryableRules as Queryable;
+use Pin\Scramble\SelectOption;
+use Pin\Validation\QueryableRules;
 
 /**
- * 查询上传日志和上传结果筛选项。
+ * 上传日志。
  */
 #[Group('系统 / 日志')]
 class UploadLogController extends Controller
@@ -28,21 +31,23 @@ class UploadLogController extends Controller
     public function index(Request $request): ApiResponse
     {
         $rules = [
-            ...$this->service->baseRules(),
+            ...Arr::except($this->service->baseRules(), 'request_id'),
             // 文件名
-            'name' => Queryable::like(),
+            'name' => QueryableRules::like(),
 
             // 原始文件名
-            'original_name' => Queryable::like(),
+            'original_name' => QueryableRules::like(),
 
             // 文件路径
-            'path' => Queryable::like(),
+            'path' => QueryableRules::like(),
 
             // 文件后缀
-            'extension' => Queryable::in(),
+            'extension' => QueryableRules::in(),
+            'extension.*' => 'string',
 
             // 上传返回码
-            'code' => Queryable::inNumeric(),
+            'code' => QueryableRules::inNumeric(),
+            'code.*' => 'integer',
         ];
         $request->validate($rules);
 
@@ -52,37 +57,63 @@ class UploadLogController extends Controller
     /**
      * 上传日志筛选项
      *
-     * @response ApiResponse<array{
-     *     extensions: Pin\Scramble\SelectOption[],
-     *     codes: Pin\Scramble\SelectOption[]
+     * @return ApiResponse<array{
+     *     extensions: SelectOption[],
+     *     codes: SelectOption[]
      * }>
      */
     public function options(): ApiResponse
     {
-        $data = $this->service->options(['extension', 'code'], fn (Collection $data) => [
-            'extensions' => $data->keyBy('extension')
-                ->keys()
-                ->sort()
-                ->values()
-                ->map(fn ($item) => ['label' => $item, 'value' => $item])
-                ->toArray(),
-            'codes' => $data->keyBy('code')
-                ->keys()
-                ->sort()
-                ->values()
-                ->map(fn ($item) => [
-                    'label' => $item.'/'.($item === 0 ? '上传成功' : Errors::get($item)->message()),
-                    'value' => $item,
-                ])
-                ->toArray(),
+        $data = $this->service->options(['extension', 'code'], fn (Collection $logs): array => [
+            'extensions' => $this->extensionOptions($logs),
+            'codes' => $this->codeOptions($logs),
         ]);
 
         return $this->success($data);
     }
 
     /**
-     * 日志模型
+     * 返回码筛选项。
+     *
+     * @param  Collection<int, UploadLog>  $logs
+     * @return list<array{label: string, value: int}>
      */
+    protected function codeOptions(Collection $logs): array
+    {
+        return $logs->pluck('code', 'code')
+            ->sort(SORT_NUMERIC)
+            ->values()
+            ->map(static fn (int $code): array => [
+                'label' => $code.'/'.($code === 0 ? '上传成功' : Errors::getMessage($code)),
+                'value' => $code,
+            ])
+            ->all();
+    }
+
+    /**
+     * 后缀筛选项。
+     *
+     * @param  Collection<int, UploadLog>  $logs
+     * @return list<array{label: string, value: string}>
+     */
+    protected function extensionOptions(Collection $logs): array
+    {
+        return $logs->pluck('extension', 'extension')
+            ->sort(SORT_STRING)
+            ->values()
+            ->map(static fn (string $extension): array => [
+                'label' => $extension,
+                'value' => $extension,
+            ])
+            ->all();
+    }
+
+    /**
+     * 日志模型。
+     *
+     * @return class-string<UploadLog>
+     */
+    #[Override]
     protected function modelClass(): string
     {
         return UploadLog::class;

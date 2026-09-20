@@ -12,15 +12,15 @@ use Pin\Route\Attributes\Title;
 use Pin\Route\Routable;
 
 /**
- * 验证接口路由定义
+ * 验证路由。
  */
 enum ValidationRoute: string implements Routable
 {
     use InteractsWithRoute;
 
     #[Title('验证密码')]
+    #[Name('validation.password')]
     #[Access(false)]
     #[Middleware(Decrypt::class.':password')]
-    #[Name('validation.password')]
     case Password = 'POST:/api/validation/password';
 }

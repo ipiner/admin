@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Listeners;
 
 use App\Events\ActivityEvent;
@@ -9,19 +11,22 @@ use Pin\Modules\Log\Facades\Log;
 use Pin\Modules\Log\Payloads\ActivityPayload;
 use Pin\Modules\Log\Payloads\LoginPayload;
 
+/**
+ * 登录成功日志监听器。
+ */
 class LogLoginSucceeded
 {
     /**
-     * Handle the event.
+     * 记录登录和行为日志。
      */
     public function handle(LoginSucceeded $event): void
     {
         $this->createLoginLog($event->admin);
-        $this->createActivityLog();
+        $this->createActivityLog($event->admin);
     }
 
     /**
-     * 登录成功日志
+     * 记录登录成功。
      */
     protected function createLoginLog(Admin $admin): void
     {
@@ -29,11 +34,15 @@ class LogLoginSucceeded
     }
 
     /**
-     * 登录成功行为日志
+     * 记录登录成功行为。
      */
-    protected function createActivityLog(): void
+    protected function createActivityLog(Admin $admin): void
     {
-        $payload = new ActivityPayload(ActivityEvent::LoginSucceeded)->subject(null, '系统');
-        Log::create($payload);
+        Log::create(
+            new ActivityPayload(ActivityEvent::LoginSucceeded)
+                ->subject(null, '系统')
+                ->uid($admin->id)
+                ->username($admin->username)
+        );
     }
 }

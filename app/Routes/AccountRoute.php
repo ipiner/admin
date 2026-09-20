@@ -12,7 +12,7 @@ use Pin\Route\Attributes\Title;
 use Pin\Route\Routable;
 
 /**
- * 帐号接口路由定义
+ * 账号路由。
  */
 enum AccountRoute: string implements Routable
 {

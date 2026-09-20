@@ -12,37 +12,36 @@ use Pin\Modules\Log\Facades\Log;
 use Pin\Modules\Log\Payloads\ActivityPayload;
 
 /**
- * 后台登录和退出接口。
+ * 登录与注销。
  */
 #[Group('登录')]
 class LoginController extends Controller
 {
     /**
-     * 登录
+     * 登录。
      *
      * @return ApiResponse<LoginResource>
      */
     public function login(LoginAction $action): ApiResponse
     {
-        $user = $action->handle();
-        if (is_array($user)) {
-            return $this->error($user['code'], $user['message'])->withStatusCode($user['status']);
+        $result = $action->handle();
+        if (is_array($result)) {
+            return $this->error($result['code'], $result['message'])
+                ->withStatusCode($result['status']);
         }
 
-        return $this->success(new LoginResource($user), '登录成功');
+        return $this->success(new LoginResource($result), '登录成功');
     }
 
     /**
-     * 退出
+     * 注销请求 Token。
      *
      * @return ApiResponse<null>
      */
     public function logout(): ApiResponse
     {
         if (auth()->user()) {
-            $payload = new ActivityPayload(ActivityEvent::Logout)
-                ->subject(null, '系统');
-            Log::create($payload);
+            Log::create(new ActivityPayload(ActivityEvent::Logout)->subject(null, '系统'));
 
             auth()->logout();
         }

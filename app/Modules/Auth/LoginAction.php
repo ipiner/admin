@@ -11,22 +11,23 @@ use App\Models\System\Admin;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Validator;
-use Pin\Access\Facades\Access;
+use Override;
 use Pin\Action\Action;
 use Pin\Captcha\Captcha;
 use Pin\Errors\IError;
 use Pin\Exceptions\ValidationException;
 use Pin\Faker\Fake;
 use Pin\Support\Facades\Password;
+use Throwable;
 
 /**
- * 登录 Action
+ * 管理员登录。
  */
 class LoginAction extends Action
 {
-    protected Admin $admin;
-
     /**
+     * 校验登录凭据。
+     *
      * @return Admin|array{code: int, message: string, status: int}
      */
     public function handle(): Admin|array
@@ -34,20 +35,18 @@ class LoginAction extends Action
         $data = $this->validated();
         $admin = $this->findAdmin($data['username']);
 
-        // 验证码
-        $res = Captcha::verify($data['captcha'], $admin->captcha_rule);
-        if ($res->err !== null) {
-            return $this->loginFail(
+        $result = Captcha::verify($data['captcha'], $admin->captcha_rule);
+        if ($result->err) {
+            return $this->failLogin(
                 $admin,
-                $res->err,
+                $result->err,
                 null,
-                Arr::except($res->toArray(), 'err'),
+                Arr::except($result->toArray(), 'err'),
             );
         }
 
-        // 用户名
         if ($admin->id === 0) {
-            return $this->loginFail(
+            return $this->failLogin(
                 $admin,
                 Errors::LoginAccountNotFound,
                 null,
@@ -55,25 +54,25 @@ class LoginAction extends Action
             );
         }
 
-        // 密码
         if (! Password::check($data['password'], $admin->salt, $admin->password)) {
-            return $this->loginFail($admin, Errors::LoginPasswordMismatch);
+            return $this->failLogin($admin, Errors::LoginPasswordMismatch);
         }
 
-        $admin->transaction(fn () => $this->loginSuccess($admin));
+        $this->completeLogin($admin);
 
         return $admin;
     }
 
     /**
-     * 验证失败时也写入登录日志，便于审计异常登录请求。
+     * 记录参数验证失败。
      */
+    #[Override]
     protected function failedValidation(Validator $validator): void
     {
-        $username = $this->payload('username') ?? 'empty:'.uniqid();
+        $username = $this->payload('username');
         [$code, $message] = ValidationException::resolveCodeMessage($validator->errors()->first());
-        $this->loginFail(
-            $this->findAdmin($username),
+        $this->failLogin(
+            $this->findAdmin(is_string($username) ? $username : ''),
             $code,
             $message,
             $validator->errors()->toArray(),
@@ -82,61 +81,73 @@ class LoginAction extends Action
     }
 
     /**
-     * 查询管理员
+     * 查找登录账号。
      */
     protected function findAdmin(string $username): Admin
     {
-        return Admin::findBy('username', $username)
+        return ($username !== '' ? Admin::findBy('username', $username) : null)
             ?? new Admin(['id' => 0, 'username' => $username]);
     }
 
     /**
-     * 登录失败
+     * 记录登录失败。
      *
      * @return array{code: int, message: string, status: int}
      */
-    protected function loginFail(
+    protected function failLogin(
         Admin $admin,
         int|IError $code,
         ?string $message = null,
         array $context = []
     ): array {
-        $err = $this->resolveError($code, $message);
+        $error = $this->resolveError($code, $message);
 
         event(new LoginFailed(
             $admin,
-            $err['code'],
-            $err['message'],
-            $err['internal_code'],
+            $error['code'],
+            $error['message'],
+            $error['internal_code'],
             $context,
         ));
 
         return [
-            'code' => $err['code'],
-            'message' => $err['message'],
-            'status' => $err['status'],
+            'code' => $error['code'],
+            'message' => $error['message'],
+            'status' => $error['status'],
         ];
     }
 
     /**
-     * 登录成功
+     * 完成登录。
      */
-    protected function loginSuccess(Admin $admin): void
+    protected function completeLogin(Admin $admin): void
     {
-        auth()->setUser($admin);
-        Access::flushAccess($admin);
-        $admin->withoutOperationLogging(function () use ($admin) {
-            $admin->login_num += 1;
-            $admin->last_login_at = (string) now();
-            $admin->last_login_ip = Request::ip();
-            $admin->update();
-        });
+        $guard = auth()->guard();
+        $previousUser = $guard->hasUser() ? $guard->user() : null;
 
-        event(new LoginSucceeded($admin));
+        try {
+            $admin->getConnection()->transaction(function () use ($admin, $guard) {
+                $guard->setUser($admin);
+                $accessProvider = config('pin.access.access_provider');
+                $accessProvider::flushAccess($admin);
+
+                $admin->withoutOperationLogging(fn () => $admin->update([
+                    'login_num' => $admin->login_num + 1,
+                    'last_login_at' => (string) now(),
+                    'last_login_ip' => Request::ip(),
+                ]));
+
+                event(new LoginSucceeded($admin));
+            });
+        } catch (Throwable $e) {
+            $previousUser ? $guard->setUser($previousUser) : $guard->forgetUser();
+
+            throw $e;
+        }
     }
 
     /**
-     * 解析错误
+     * 解析登录错误。
      *
      * @return array{code: int, message: string, status: int, internal_code: int}
      */
@@ -145,11 +156,11 @@ class LoginAction extends Action
         if ($code instanceof IError) {
             return [
                 'code' => $code instanceof Errors
-                    ? Errors::LoginFailed->code() // 对外返回统一失败码
+                    ? Errors::LoginFailed->code()
                     : $code->code(),
                 'message' => $code->message(),
                 'status' => $code->statusCode(),
-                'internal_code' => $code->code(), // 内部日志使用
+                'internal_code' => $code->code(),
             ];
         }
 
@@ -164,7 +175,7 @@ class LoginAction extends Action
     /**
      * 登录请求验证规则。
      */
-    protected function rules(): array
+    public function rules(): array
     {
         return [
             // 用户名
@@ -175,15 +186,16 @@ class LoginAction extends Action
              *
              * @example plain:123456
              */
-            'password' => 'required|fake:password',
+            'password' => 'required|string|fake:password',
             /**
-             * 验证码，格式 `input.token`
+             * 验证码，格式 `input|token`
              *
              * @example plain:a|a
              */
             'captcha' => [
                 'required',
-                Fake::make(fn () => 'plain:a|a'),
+                'string',
+                Fake::make(static fn () => 'plain:a|a'),
             ],
         ];
     }

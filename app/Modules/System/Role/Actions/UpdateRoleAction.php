@@ -9,30 +9,30 @@ use App\Models\System\Role;
 use Pin\Services\Results\UpdateResult;
 
 /**
- * 更新角色资料和菜单权限。
+ * 更新角色。
  */
 class UpdateRoleAction extends RoleAction
 {
     /**
-     * 执行角色更新流程。
+     * 更新角色。
      */
     public function handle(int $id): UpdateResult
     {
-        $item = Role::findOrFail($id);
+        $role = Role::findOrFail($id);
         $data = $this->validated();
-        $menuIds = $this->extractMenuIds($data, $item->isSuperRole());
+        $menuIds = $this->extractMenuIds($data);
 
         return $this->service->update(
-            $item,
+            $role,
             $data,
-            fn (Role $item) => $this->syncMenus($item, $menuIds),
+            fn (Role $role) => $this->syncMenus($role, $menuIds),
         );
     }
 
     /**
-     * 更新角色请求验证规则。
+     * 更新验证规则。
      */
-    protected function rules(): array
+    public function rules(): array
     {
         return [
             ...$this->basicRules(),
@@ -43,27 +43,28 @@ class UpdateRoleAction extends RoleAction
     }
 
     /**
-     * 同步菜单权限，并把权限变更写入操作日志。
+     * 同步菜单。
      */
-    protected function syncMenus(Role $item, array $menuIds): array
+    protected function syncMenus(Role $role, array $menuIds): void
     {
-        if ($item->isSuperRole()) {
-            return [];
+        if ($role->isSuperRole()) {
+            return;
         }
 
-        $old = $item->menus()->orderBy('menu_id')->pluck('name')->join("\n");
-        $result = $item->menus()->sync($menuIds);
+        $old = $role->menus()->orderBy('menu_id')->pluck('name')->join("\n");
+        $changes = $role->menus()->sync($menuIds);
 
-        if (empty($result['attached']) && empty($result['detached'])) {
-            return $result;
+        if (! $changes['attached'] && ! $changes['detached']) {
+            return;
         }
+
+        $role->unsetRelation('menus');
+        $this->service->flushAccess($role);
 
         $new = Menu::findMany($menuIds)->sortBy('id')->pluck('name')->join("\n");
-        $item->mergeOperationChanges(
+        $role->mergeOperationChanges(
             ['menus' => "\n".$old.($old ? "\n" : '')],
             ['menus' => "\n".$new.($new ? "\n" : '')]
         );
-
-        return $result;
     }
 }

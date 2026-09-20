@@ -9,17 +9,14 @@ use Illuminate\Http\Request;
 use Pin\Http\ApiResponse;
 use Pin\Password\PasswordRule;
 
+/**
+ * 数据验证接口。
+ */
 #[Group('验证')]
 class ValidationController extends Controller
 {
     /**
-     * 验证密码
-     *
-     * - 长度8-32位
-     * - 不能包含空格
-     * - 至少需要包含字母、数字、特殊字符中的2种
-     * - 不能包含连续5位以上的顺序字母或数字
-     * - 不能包含连续重复5位以上的字符
+     * 验证密码。
      *
      * @return ApiResponse<null>
      */
@@ -29,9 +26,13 @@ class ValidationController extends Controller
             /**
              * 密码（加密传输）
              *
-             * @example plain:123456
+             * @example plain:test@123
              */
-            'password' => ['required', new PasswordRule()->requiredCharacterTypes(2)],
+            'password' => [
+                'required',
+                'string',
+                new PasswordRule()->requiredCharacterTypes(2),
+            ],
         ]);
 
         return $this->success();

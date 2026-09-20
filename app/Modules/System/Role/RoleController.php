@@ -17,7 +17,7 @@ use Pin\Scramble\SelectOption;
 use Pin\Scramble\Updated;
 
 /**
- * 角色管理和角色选择器接口。
+ * 角色管理。
  */
 #[Group('系统 / 角色')]
 class RoleController extends Controller
@@ -51,7 +51,7 @@ class RoleController extends Controller
     public function index(): ApiResponse
     {
         $data = Role::orderBy('id')
-            ->with('menus')
+            ->with('menus:id,name,path')
             ->pagination()
             ->toArray(RoleResource::class);
 
@@ -72,17 +72,14 @@ class RoleController extends Controller
     /**
      * 角色下拉框选择器
      *
-     * - `新增` / `编辑` 管理员时的角色下拉选择器选项
-     *
      * @return ApiResponse<SelectOption[]>
      */
     public function selector(): ApiResponse
     {
-        $options = Role::findAll()->map(fn (Role $item) => [
-            'label' => $item->name,
-            'value' => $item->id,
-        ])
-            ->values();
+        $options = Role::findAll()->values()->map(static fn (Role $role): array => [
+            'label' => $role->name,
+            'value' => $role->id,
+        ]);
 
         return $this->success($options);
     }

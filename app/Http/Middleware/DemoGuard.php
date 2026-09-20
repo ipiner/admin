@@ -16,10 +16,13 @@ use App\Routes\System\MenuRoute;
 use Closure;
 use Illuminate\Http\Request;
 
+/**
+ * 演示环境操作限制。
+ */
 class DemoGuard
 {
     /**
-     * 处理请求
+     * 校验演示环境请求。
      */
     public function handle(Request $request, Closure $next): mixed
     {
@@ -27,16 +30,18 @@ class DemoGuard
             return $next($request);
         }
 
-        $this->handleAdminLogin($request);
-        $this->handleCreate($request);
-        $this->handleDelete($request);
-        $this->handleUpdate($request);
+        match ($request->method()) {
+            'POST' => $this->handleCreate($request),
+            'DELETE' => $this->handleDelete($request),
+            'PUT' => $this->handleUpdate($request),
+            default => null,
+        };
 
         return $next($request);
     }
 
     /**
-     * 处理 `admin` 用户登录
+     * 校验 admin 登录。
      */
     protected function handleAdminLogin(Request $request): void
     {
@@ -44,32 +49,37 @@ class DemoGuard
             return;
         }
 
+        $username = $request->json('username');
         if (
-            $request->json('username') === 'admin'
-            && $request->cookie('admin_login_token') !== '1'
+            ! is_string($username)
+            || strcasecmp($username, 'admin') !== 0
+            || $request->cookie('admin_login_token') === '1'
         ) {
-            event(new LoginFailed(
-                Admin::find(1),
-                Errors::LoginDisabled->code(),
-                Errors::LoginDisabled->message(),
-                Errors::LoginDisabled->code(),
-            ));
-            $this->throws(Errors::LoginDisabled->message(), false);
+            return;
         }
+
+        $code = Errors::LoginDisabled->code();
+        $message = Errors::LoginDisabled->message();
+        event(new LoginFailed(
+            Admin::find(Admin::ADMINISTRATOR_ID),
+            $code,
+            $message,
+            $code,
+        ));
+        $this->throws($message, false);
     }
 
-    /*
-     * 处理新增
+    /**
+     * 校验新增请求。
      */
     protected function handleCreate(Request $request): void
     {
-        if ($request->isMethod('POST')) {
-            $this->handleCreateMenu($request);
-        }
+        $this->handleAdminLogin($request);
+        $this->handleCreateMenu($request);
     }
 
-    /*
-     * 处理新增菜单
+    /**
+     * 校验新增菜单。
      */
     protected function handleCreateMenu(Request $request): void
     {
@@ -83,19 +93,17 @@ class DemoGuard
         }
     }
 
-    /*
-     * 删除处理
+    /**
+     * 校验删除请求。
      */
     protected function handleDelete(Request $request): void
     {
-        if ($request->isMethod('DELETE')) {
-            $this->handleDeleteAdmin($request);
-            $this->handleDeleteMenu($request);
-        }
+        $this->handleDeleteAdmin($request);
+        $this->handleDeleteMenu($request);
     }
 
     /**
-     * 处理删除管理员
+     * 校验删除管理员。
      */
     protected function handleDeleteAdmin(Request $request): void
     {
@@ -108,32 +116,29 @@ class DemoGuard
     }
 
     /**
-     * 处理删除菜单
+     * 校验删除菜单。
      */
     protected function handleDeleteMenu(Request $request): void
     {
         if (
             $request->isRequest(MenuRoute::Delete->name())
-            && ($menu = Menu::find((int) $request->route('id')))
-            && $menu->type !== Menu::BUTTON
+            && $this->isProtectedMenuRequest($request)
         ) {
             $this->throws('菜单只能删除按钮');
         }
     }
 
     /**
-     * 处理更新
+     * 校验更新请求。
      */
     protected function handleUpdate(Request $request): void
     {
-        if ($request->isMethod('PUT')) {
-            $this->handleUpdateAdmin($request);
-            $this->handleUpdateMenu($request);
-        }
+        $this->handleUpdateAdmin($request);
+        $this->handleUpdateMenu($request);
     }
 
     /**
-     * 处理更新管理员
+     * 校验更新管理员。
      */
     protected function handleUpdateAdmin(Request $request): void
     {
@@ -153,21 +158,24 @@ class DemoGuard
     }
 
     /**
-     * 处理更新菜单
+     * 校验更新菜单。
      */
     protected function handleUpdateMenu(Request $request): void
     {
         if (
-            $request->isRequest([MenuRoute::Update->name(), MenuRoute::UpdateVisible->name(), MenuRoute::UpdateEnabled->name()])
-            && ($menu = Menu::find((int) $request->route('id')))
-            && $menu->type !== Menu::BUTTON
+            $request->isRequest([
+                MenuRoute::Update->name(),
+                MenuRoute::UpdateVisible->name(),
+                MenuRoute::UpdateEnabled->name(),
+            ])
+            && $this->isProtectedMenuRequest($request)
         ) {
             $this->throws('菜单只能更新按钮');
         }
     }
 
     /**
-     * 作用户是否为受保护管理员
+     * 是否为受保护管理员。
      */
     protected function isProtectedAdmin(?Admin $admin): bool
     {
@@ -175,27 +183,40 @@ class DemoGuard
     }
 
     /**
-     * 被操作用户是否为受保护管理员
+     * 是否操作受保护管理员。
      */
     protected function isProtectedAdminRequest(Request $request): bool
     {
-        $admin = Admin::find((int) $request->route('id'));
-
-        return $this->isProtectedAdmin($admin);
+        return $this->isProtectedAdmin(Admin::find((int) $request->route('id')));
     }
 
     /**
-     * 是否执行验证
+     * 是否操作受保护菜单。
+     */
+    protected function isProtectedMenuRequest(Request $request): bool
+    {
+        $menu = Menu::find((int) $request->route('id'));
+        if (! $menu) {
+            return false;
+        }
+
+        return $menu->type !== Menu::BUTTON
+            || $request->isRequest(MenuRoute::Update->name())
+                && $request->json('type') === Menu::MENU;
+    }
+
+    /**
+     * 是否执行演示环境校验。
      */
     protected function shouldRun(Request $request): bool
     {
         return $request->server('RUNNING_IN_DEMO')
-            && ! $request->user()?->isAdministrator()
-            && ! $request->isReading();
+            && ! $request->isReading()
+            && ! $request->user()?->isAdministrator();
     }
 
     /**
-     * 抛异常
+     * 拒绝操作。
      */
     protected function throws(string $message, bool $withPrefix = true): never
     {

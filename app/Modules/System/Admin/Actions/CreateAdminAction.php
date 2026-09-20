@@ -9,12 +9,12 @@ use App\Models\System\Role;
 use Pin\Services\Results\CreateResult;
 
 /**
- * 创建管理员并同步初始角色。
+ * 创建管理员。
  */
 class CreateAdminAction extends AdminAction
 {
     /**
-     * 执行管理员创建流程。
+     * 创建管理员。
      */
     public function handle(): CreateResult
     {
@@ -23,31 +23,30 @@ class CreateAdminAction extends AdminAction
 
         return $this->service->create(
             $data,
-            fn (Admin $item) => $this->attachRoles($item, $roleIds),
+            fn (Admin $admin) => $this->attachRoles($admin, $roleIds),
         );
     }
 
     /**
-     * 创建后挂载角色，并补充操作日志变更内容。
+     * 分配角色。
      */
-    protected function attachRoles(Admin $item, array $roleIds): void
+    protected function attachRoles(Admin $admin, array $roleIds): void
     {
-        $roleIds = in_array(Role::SUPER_ROLE_ID, $roleIds) ? [Role::SUPER_ROLE_ID] : $roleIds;
         if (! $roleIds) {
             return;
         }
 
-        $item->roles()->attach($roleIds);
+        $admin->roles()->attach($roleIds);
         $roles = Role::findMany($roleIds)->sortBy('id')->pluck('name')->join("\n");
-        $item->mergeOperationChanges([], ['roles' => "\n".$roles."\n"]);
+        $admin->mergeOperationChanges([], ['roles' => "\n".$roles."\n"]);
     }
 
     /**
-     * 创建管理员请求验证规则。
+     * 创建验证规则。
      */
-    protected function rules(): array
+    public function rules(): array
     {
-        // ...展开，Scramble可识别
+        // 展开规则供 Scramble 解析。
         return [...$this->basicRules()];
     }
 }

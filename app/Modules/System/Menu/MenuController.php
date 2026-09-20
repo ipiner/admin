@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Models\System\Menu;
 use App\Modules\System\Menu\Actions\AvailableCodesAction;
 use App\Modules\System\Menu\Actions\CreateMenuAction;
-use App\Modules\System\Menu\Actions\MenuAction;
 use App\Modules\System\Menu\Actions\UpdateEnabledAction;
 use App\Modules\System\Menu\Actions\UpdateMenuAction;
 use App\Modules\System\Menu\Actions\UpdateVisibleAction;
@@ -19,18 +18,14 @@ use Pin\Pagination\Pagination;
 use Pin\Scramble\Created;
 use Pin\Scramble\Deleted;
 use Pin\Scramble\Updated;
-use Pin\Validation\QueryableRules as Queryable;
+use Pin\Validation\QueryableRules;
 
 /**
- * 菜单树的增删改查和选择器接口。
+ * 菜单管理。
  */
 #[Group('系统 / 菜单')]
 class MenuController extends Controller
 {
-    public function __construct(protected MenuService $service)
-    {
-    }
-
     /**
      * 新增菜单
      *
@@ -47,9 +42,9 @@ class MenuController extends Controller
      * @param  int  $id  菜单id
      * @return ApiResponse<Deleted>
      */
-    public function delete(int $id): ApiResponse
+    public function delete(MenuService $service, int $id): ApiResponse
     {
-        return $this->success($this->service->delete($id));
+        return $this->success($service->delete($id));
     }
 
     /**
@@ -68,28 +63,24 @@ class MenuController extends Controller
              *
              * @example 1 / 用户
              */
-            'q' => Queryable::ns('id,name'),
+            'q' => QueryableRules::ns('id,name'),
 
             // 菜单编码
-            'code' => Queryable::like(),
+            'code' => QueryableRules::like(),
 
             // 前端路由
-            'route' => Queryable::like(),
+            'route' => QueryableRules::like(),
         ];
         $request->validate($rules);
-        $paging = $request->query('paging') === '1';
-        $data = $service->context('paging', $paging)->pagination(
-            $paging ? $rules : null
-        );
+        $paging = $request->boolean('paging');
 
-        return $this->success($data);
+        return $this->success(
+            $service->context('paging', $paging)->pagination($paging ? $rules : null)
+        );
     }
 
     /**
      * 菜单下拉框选择器
-     *
-     * - `新增` / `编辑` 菜单时的上级菜单下拉选择器选项
-     * - `新增` / `编辑` 角色时的权限下拉选择器选项
      *
      * @return ApiResponse<array{
      *     label: string,
@@ -100,11 +91,11 @@ class MenuController extends Controller
      */
     public function selector(): ApiResponse
     {
-        $options = Menu::findAll()->values()->map(fn ($item) => [
-            'label' => $item->name,
-            'value' => $item->id,
-            'type' => $item->type,
-            'pid' => $item->pid,
+        $options = Menu::findAll()->values()->map(static fn (Menu $menu): array => [
+            'label' => $menu->name,
+            'value' => $menu->id,
+            'type' => $menu->type,
+            'pid' => $menu->pid,
         ]);
 
         return $this->success($options);
@@ -112,12 +103,6 @@ class MenuController extends Controller
 
     /**
      * 可用菜单编码列表
-     *
-     * `新增` / `编辑` 菜单时的菜单编码下拉选择器选项
-     *
-     * 默认情况下，仅返回尚未添加到菜单中的编码
-     *
-     * 可通过 `all=1` 返回所有可用的菜单编码
      *
      * @return ApiResponse<array{
      *     label: string,
@@ -138,7 +123,7 @@ class MenuController extends Controller
      */
     public function update(UpdateMenuAction $action, int $id): ApiResponse
     {
-        return $this->handleUpdate($action, $id);
+        return $this->success($action->handle($id));
     }
 
     /**
@@ -149,7 +134,7 @@ class MenuController extends Controller
      */
     public function updateEnabled(UpdateEnabledAction $action, int $id): ApiResponse
     {
-        return $this->handleUpdate($action, $id);
+        return $this->success($action->handle($id));
     }
 
     /**
@@ -159,14 +144,6 @@ class MenuController extends Controller
      * @return ApiResponse<Updated>
      */
     public function updateVisible(UpdateVisibleAction $action, int $id): ApiResponse
-    {
-        return $this->handleUpdate($action, $id);
-    }
-
-    /**
-     * 更新操作
-     */
-    private function handleUpdate(MenuAction $action, int $id): ApiResponse
     {
         return $this->success($action->handle($id));
     }

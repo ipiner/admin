@@ -4,38 +4,65 @@ declare(strict_types=1);
 
 namespace App\Modules\Upload;
 
+use Closure;
 use Illuminate\Http\Request;
+use Pin\Errors\Errors;
 use Pin\Upload\Rules\Upload as UploadRule;
 use Pin\Upload\UploadedFile;
+use Throwable;
 
 /**
- * 统一处理后台上传验证、存储目录和上传文件对象返回。
+ * 文件上传服务。
  */
 class UploadService
 {
     /**
-     * 验证请求中的上传文件并保存到日期目录。
+     * 验证并保存上传文件。
+     *
+     * @param  (Closure(UploadedFile): void)|null  $beforeStore
      */
     public function upload(
         Request $request,
         ?string $category = null,
         ?UploadRule $rule = null,
-        string $name = 'file'
+        string $name = 'file',
+        ?Closure $beforeStore = null
     ): UploadedFile {
-        $data = $request->validate($this->uploadRules($rule, $name));
-        $file = UploadedFile::item($data[$name]);
-        $file->storeAs(($category ?: '').date('/Ym/d'));
+        $request->validate($this->uploadRules($rule, $name));
+        $file = UploadedFile::item($request->file($name));
+
+        try {
+            if ($beforeStore) {
+                $beforeStore($file);
+            }
+
+            if (! $file->storeAs($this->directory($category))) {
+                Errors::ServerError->throw('文件上传失败');
+            }
+        } catch (Throwable $e) {
+            $file->errors = [Errors::ServerError->code() => '文件上传失败'];
+
+            throw $e;
+        }
 
         return $file;
     }
 
     /**
-     * 构造上传字段的验证规则。
+     * 上传目录。
+     */
+    protected function directory(?string $category): string
+    {
+        return ltrim(trim($category ?? '', '/').now()->format('/Ym/d'), '/');
+    }
+
+    /**
+     * 上传验证规则。
      */
     protected function uploadRules(?UploadRule $rule, string $name = 'file'): array
     {
         return [
-            $name => ['required', $rule ?: new UploadRule()->disk('upload')],
+            $name => ['required', $rule ?? new UploadRule()->disk('upload')],
         ];
     }
 }
