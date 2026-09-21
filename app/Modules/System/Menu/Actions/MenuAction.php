@@ -17,7 +17,7 @@ use Pin\Validation\Rules\Unique;
  */
 class MenuAction extends Action
 {
-    public function __construct(MenuService $service = new MenuService())
+    public function __construct(MenuService $service)
     {
         parent::__construct($service);
     }

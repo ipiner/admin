@@ -17,7 +17,7 @@ use Pin\Validation\Rules\Unique;
  */
 class AdminAction extends Action
 {
-    public function __construct(protected AdminService $service = new AdminService())
+    public function __construct(protected AdminService $service)
     {
     }
 

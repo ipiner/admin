@@ -15,7 +15,7 @@ use Pin\Validation\Rules\Unique;
  */
 class RoleAction extends Action
 {
-    public function __construct(protected RoleService $service = new RoleService())
+    public function __construct(protected RoleService $service)
     {
     }
 

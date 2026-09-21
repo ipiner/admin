@@ -84,8 +84,12 @@ class AdminController extends Controller
      * @param  int  $id  管理员id
      * @return ApiResponse<Updated>
      */
-    public function updateAvatar(Request $request, AdminService $service, int $id): ApiResponse
-    {
+    public function updateAvatar(
+        Request $request,
+        AdminService $service,
+        UploadService $uploadService,
+        int $id
+    ): ApiResponse {
         if (! $request->files->get('file')) {
             return $this->success($service->update($id, ['avatar' => '']));
         }
@@ -98,7 +102,7 @@ class AdminController extends Controller
 
         return $this->success($service->update(
             $id,
-            ['avatar' => new UploadService()->upload($request)->url()]
+            ['avatar' => $uploadService->upload($request)->url()]
         ));
     }
 }

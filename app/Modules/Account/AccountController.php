@@ -108,7 +108,7 @@ class AccountController extends Controller
             'file' => 'file',
         ]);
 
-        $url = new UploadService()->upload($request)->url();
+        $url = $service->upload($request)->url();
 
         return $this->success(
             [
