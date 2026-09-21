@@ -9,7 +9,7 @@ use Pin\Route\Attributes\Title;
 use Pin\Route\Routable;
 
 /**
- * 菜单接口路由定义
+ * 菜单路由
  */
 enum MenuRoute: string implements Routable
 {
@@ -34,10 +34,7 @@ enum MenuRoute: string implements Routable
     case Delete = 'DELETE:/api/system/menus/{id}';
 
     /**
-     * 菜单下拉框选择器
-     *
-     *  - `新增` / `编辑` 菜单时的上级菜单下拉选择器选项
-     *  - `新增` / `编辑` 角色时的权限下拉选择器选项
+     * 菜单与角色权限选择器
      */
     #[Title('菜单下拉框选择器')]
     case Selector = 'GET:/api/system/menus/selector';

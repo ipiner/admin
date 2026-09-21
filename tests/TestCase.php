@@ -14,11 +14,6 @@ Pest::boot();
 
 abstract class TestCase extends \Illuminate\Foundation\Testing\TestCase
 {
-    /**
-     * @var array<int, string>
-     */
-    protected static array $authTokens = [];
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -41,10 +36,6 @@ abstract class TestCase extends \Illuminate\Foundation\Testing\TestCase
 
     protected function authToken(Admin $admin): string
     {
-        if (isset(static::$authTokens[$admin->id])) {
-            return static::$authTokens[$admin->id];
-        }
-
-        return static::$authTokens[$admin->id] = LoginResource::forAdmin($admin)['token'];
+        return LoginResource::forAdmin($admin)['token'];
     }
 }

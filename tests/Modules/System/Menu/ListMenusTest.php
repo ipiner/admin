@@ -7,7 +7,15 @@ use App\Routes\System\MenuRoute;
 use Database\Factories\System\MenuFactory;
 
 it('lists menus when paging is enabled', function () {
-    $menu = MenuFactory::new()->create(['type' => Menu::MENU]);
+    $suffix = bin2hex(random_bytes(6));
+    $menu = MenuFactory::new()->create([
+        'type' => Menu::MENU,
+        'name' => "Testing menu {$suffix}",
+        'code' => "testing_menu_{$suffix}",
+        'route' => "/testing-menu-{$suffix}",
+    ]);
+    MenuFactory::new()->create(['type' => Menu::MENU]);
+
     MenuRoute::Index->testing($this)->withPayload(['paging' => 1])
         ->paginated(function ($items, $total, $totalPage) {
             expect(count($items))->toBeGreaterThan(1)
@@ -34,6 +42,8 @@ it('lists menus when paging is enabled', function () {
 });
 
 it('lists menus when paging is disabled', function () {
+    MenuFactory::new()->create(['type' => Menu::MENU]);
+
     MenuRoute::Index->testing($this)->withPayload(['page_size' => 1])
         ->paginated(function ($items, $total, $totalPage) {
             expect($items)->toHaveCount($total)

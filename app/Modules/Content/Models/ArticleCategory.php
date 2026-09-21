@@ -42,7 +42,7 @@ class ArticleCategory extends TreeModel
     }
 
     /**
-     * 返回操作日志中用于展示主体名称的字段。
+     * 返回操作日志中用于展示主体名称的字段
      */
     public function subjectNameColumn(): string
     {

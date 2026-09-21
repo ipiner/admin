@@ -13,7 +13,7 @@ use Pin\Route\Attributes\Title;
 use Pin\Route\Routable;
 
 /**
- * 管理员接口路由定义
+ * 管理员路由
  */
 enum AdminRoute: string implements Routable
 {
@@ -33,8 +33,8 @@ enum AdminRoute: string implements Routable
     #[Title('删除管理员')]
     case Delete = 'DELETE:/api/system/admins/{id}';
 
-    #[Name('system.admins.update.avatar')]
     #[Title('编辑管理员头像')]
+    #[Name('system.admins.update.avatar')]
     #[Middleware(UploadMiddleware::class)]
     case UpdateAvatar = 'POST:/api/system/admins/{id}/avatar';
 }

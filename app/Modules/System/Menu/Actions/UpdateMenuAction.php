@@ -7,12 +7,12 @@ namespace App\Modules\System\Menu\Actions;
 use Pin\Services\Results\UpdateResult;
 
 /**
- * 更新菜单主体字段。
+ * 更新菜单
  */
 class UpdateMenuAction extends MenuAction
 {
     /**
-     * 执行菜单更新流程。
+     * 更新菜单
      */
     public function handle(int $id): UpdateResult
     {
@@ -20,7 +20,7 @@ class UpdateMenuAction extends MenuAction
     }
 
     /**
-     * 更新菜单主体字段的验证规则。
+     * 更新验证规则
      */
     public function rules(): array
     {

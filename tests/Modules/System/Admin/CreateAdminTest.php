@@ -40,6 +40,14 @@ describe('roles', function () {
             ->assertMessage('角色 [-1] 不存在');
     });
 
+    it('allows creating admin without roles', function () {
+        AdminRoute::Create->testing($this)
+            ->withPayload(CreateAdminAction::fake(['roles' => []]))
+            ->created(
+                fn (Admin $admin) => expect($admin->roles()->get())->toBeEmpty()
+            );
+    });
+
     it('forbids non-super admin from assigning super role', function () {
         AdminRoute::Create->testing($this)
             ->json(CreateAdminAction::fake(['roles' => [Role::SUPER_ROLE_ID]]))

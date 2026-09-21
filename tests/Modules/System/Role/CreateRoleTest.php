@@ -16,6 +16,14 @@ describe('menus', function () {
             ->assertMessage('菜单 [-1,-2] 不存在');
     });
 
+    it('allows creating role without menus', function () {
+        RoleRoute::Create->testing($this)
+            ->withPayload(CreateRoleAction::fake(['menus' => []]))
+            ->created(
+                fn (Role $role) => expect($role->menus()->get())->toBeEmpty()
+            );
+    });
+
     it('attaches menus to role', function () {
         $testingMenu = MenuFactory::testingMenu();
         $menu = MenuFactory::new()->create();

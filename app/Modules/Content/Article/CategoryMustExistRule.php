@@ -9,7 +9,7 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
- * 校验文章分类必须存在。
+ * 校验文章分类必须存在
  */
 class CategoryMustExistRule implements ValidationRule
 {

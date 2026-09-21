@@ -17,63 +17,62 @@ use Pin\Route\RouteRegistry;
 use Pin\Route\RouteRegistryItem;
 
 /**
- * 从已注册路由中提取还可以创建为菜单权限的编码。
+ * 可用菜单编码
  */
 class AvailableCodesAction extends Action
 {
     /**
-     * 返回可用菜单编码列表。
+     * 获取可用编码
+     *
+     * @return Collection<int, array{label: string, value: string, name: string}>
      */
     public function handle(): Collection
     {
         $all = (bool) ($this->validated()['all'] ?? false);
-        $names = Menu::findAll()->keyBy('code');
-        $items = RouteRegistry::items()->filter(function (RouteRegistryItem $item) use ($names, $all) {
-            return ($all || ! isset($names[$item->route->getName()]))
-                && $this->shouldExclude($item);
-        });
+        $names = Menu::findAll()->pluck('name', 'code');
+        $items = RouteRegistry::items()->filter(
+            fn (RouteRegistryItem $item): bool => ($all || ! $names->has($item->route->getName()))
+                && $this->canUseAsMenu($item)
+        );
 
         return $items->sortKeys()
-            ->map(function (RouteRegistryItem $item) {
+            ->map(static function (RouteRegistryItem $item) use ($names): array {
                 $routeName = $item->route->getName();
 
                 return [
-                    'label' => $names[$routeName]?->name ?? $item->case->title(),
+                    'label' => $names->get($routeName) ?? $item->case->title(),
                     'value' => $routeName,
-                    'name' => Str::of($routeName)
-                        ->replace(['.', '-'], '_')
-                        ->upper(),
+                    'name' => Str::upper(str_replace(['.', '-'], '_', $routeName)),
                 ];
             })
             ->values();
     }
 
     /**
-     * 过滤不应作为菜单权限创建的路由。
+     * 是否可作为菜单权限
      */
-    protected function shouldExclude(RouteRegistryItem $item): bool
+    protected function canUseAsMenu(RouteRegistryItem $item): bool
     {
         if (
-            in_array(get_class($item->case), [AccountRoute::class, LoginRoute::class, CaptchaRoute::class], true)
-            || in_array($item->case, [MenuRoute::AvailableCodes])
-            || Str::endsWith($item->case->name(), ['.selector'])
+            in_array($item->case::class, [
+                AccountRoute::class, LoginRoute::class, CaptchaRoute::class,
+            ], true)
+            || $item->case === MenuRoute::AvailableCodes
+            || Str::endsWith($item->route->getName(), '.selector')
             || ! $item->case->title()
         ) {
             return false;
         }
 
-        $attr = $item->case->attribute(Access::class);
-        if ($attr !== null && $attr->value !== $item->case->name()) {
-            return false;
-        }
+        $access = $item->case->attribute(Access::class);
 
-        return true;
+        return ! $access || $access->value === $item->route->getName();
     }
 
     /**
-     * 可用编码查询参数验证规则。
+     * 查询验证规则
      */
-    protected function rules(): array
+    public function rules(): array
     {
         return [
             /**

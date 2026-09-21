@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * 文章列表响应资源。
+ * 文章列表响应资源
  *
  * @mixin Article
  */

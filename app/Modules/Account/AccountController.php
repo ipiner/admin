@@ -10,15 +10,15 @@ use App\Modules\Upload\UploadService;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Pin\Access\Facades\Access;
 use Pin\Errors\Errors;
 use Pin\Http\ApiResponse;
 use Pin\Scramble\Updated;
 use Pin\Services\Results\UpdateResult;
+use Pin\Support\Facades\Password;
 
 /**
- * 处理当前登录管理员的个人资料、菜单权限和密码修改。
+ * 账号管理
  */
 #[Group('用户中心')]
 class AccountController extends Controller
@@ -26,17 +26,16 @@ class AccountController extends Controller
     /**
      * 获取账号信息
      *
+     * @param  Admin  $account
      * @return ApiResponse<AccountResource>
      */
-    public function profile(
-        Request $request,
-        Authenticatable $account,
-    ): ApiResponse {
+    public function profile(Request $request, Authenticatable $account): ApiResponse
+    {
         $request->validate([
             // 返回菜单
             'menus' => 'nullable|in:0,1',
         ]);
-        $access = Access::forUser(/** @var Admin $account */ $account);
+        $access = Access::forUser($account);
 
         return $this->success(new AccountResource([
             'account' => $account,
@@ -46,8 +45,9 @@ class AccountController extends Controller
     }
 
     /**
-     * 修改个人密码
+     * 修改密码
      *
+     * @param  Admin  $account
      * @return ApiResponse<Updated>
      */
     public function updatePassword(Request $request, Authenticatable $account): ApiResponse
@@ -59,37 +59,40 @@ class AccountController extends Controller
                  *
                  * @example plain:123456
                  */
-                'current_password' => 'required',
+                'current_password' => 'required|string',
 
                 /**
                  * 新密码（加密传输）
                  *
                  * @example plain:123456
                  */
-                'password' => 'required',
+                'password' => 'required|string',
             ],
             [],
             ['password' => '新密码']
         );
-        /** @var Admin $account */
-        if (! Hash::check($data['current_password'].$account->salt, $account->password)) {
+        if (! Password::check($data['current_password'], $account->salt, $account->password)) {
             Errors::UpdateFailed->throw('当前密码错误');
         }
         $updated = $account->update([
             'password' => $account->hashPassword($data['password']),
         ]);
 
-        return $this->success(new UpdateResult($account, $updated));
+        return $this->success(new UpdateResult($account, (bool) $updated));
     }
 
     /**
      * 更新头像
      *
-     * @return ApiResponse<array{url: string|null}>
+     * @param  Admin  $account
+     * @return ApiResponse<array{updated: bool, url: string|null}>
      */
-    public function updateAvatar(Request $request, Authenticatable $account): ApiResponse
-    {
-        if (! $request->files->get('file')) {
+    public function updateAvatar(
+        Request $request,
+        Authenticatable $account,
+        UploadService $service
+    ): ApiResponse {
+        if (! $request->hasFile('file')) {
             return $this->success(
                 [
                     'updated' => $account->update(['avatar' => '']),
@@ -117,21 +120,19 @@ class AccountController extends Controller
     }
 
     /**
-     * 修改个人信息
+     * 更新个人信息
      *
+     * @param  Admin  $account
      * @return ApiResponse<Updated>
      */
     public function updateProfile(Request $request, Authenticatable $account): ApiResponse
     {
         $data = $request->validate([
-            'realname' => 'required',
-            'avatar' => 'nullable|string|url',
+            'realname' => 'required|string',
         ]);
-        $data['avatar'] ??= '';
 
-        /** @var Admin $account */
         $updated = $account->update($data);
 
-        return $this->success(new UpdateResult($account, $updated));
+        return $this->success(new UpdateResult($account, (bool) $updated));
     }
 }

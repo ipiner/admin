@@ -11,7 +11,7 @@ use Pin\Route\Attributes\Title;
 use Pin\Route\Routable;
 
 /**
- * 上传接口路由定义
+ * 上传路由
  */
 enum UploadRoute: string implements Routable
 {

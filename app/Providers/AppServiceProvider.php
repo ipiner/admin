@@ -11,19 +11,19 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 /**
- * 应用服务提供者
- *
- * @codeCoverageIgnore
+ * 应用服务
  */
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap any application services.
+     * 注册邮件限流
      */
     public function boot(): void
     {
-        RateLimiter::for(MailQueue::LIMIT_1_M, function (SendQueuedMailable $mailable) {
-            return Limit::perMinute(1)->by($mailable->mailable->getLimitBy());
-        });
+        RateLimiter::for(
+            MailQueue::LIMIT_1_M,
+            static fn (SendQueuedMailable $job): Limit => Limit::perMinute(1)
+                ->by($job->mailable->getLimitBy())
+        );
     }
 }

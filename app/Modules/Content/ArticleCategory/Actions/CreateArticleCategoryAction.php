@@ -7,12 +7,12 @@ namespace App\Modules\Content\ArticleCategory\Actions;
 use Pin\Services\Results\CreateResult;
 
 /**
- * 创建分类节点。
+ * 创建分类节点
  */
 class CreateArticleCategoryAction extends ArticleCategoryAction
 {
     /**
-     * 执行分类创建流程。
+     * 执行分类创建流程
      */
     public function handle(): CreateResult
     {
@@ -20,7 +20,7 @@ class CreateArticleCategoryAction extends ArticleCategoryAction
     }
 
     /**
-     * 创建分类请求验证规则。
+     * 创建分类请求验证规则
      */
     protected function rules(): array
     {

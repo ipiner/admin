@@ -9,7 +9,7 @@ use Pin\Services\Results\CreateResult;
 class CreateArticleAction extends ArticleAction
 {
     /**
-     * 执行文章创建流程。
+     * 执行文章创建流程
      */
     public function handle(): CreateResult
     {
@@ -17,7 +17,7 @@ class CreateArticleAction extends ArticleAction
     }
 
     /**
-     * 创建文章请求验证规则。
+     * 创建文章请求验证规则
      */
     protected function rules(): array
     {

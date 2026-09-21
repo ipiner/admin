@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\System\Admin\Actions;
 
 use App\Models\System\Admin;
+use App\Models\System\Role;
 use App\Modules\System\Admin\AdminService;
 use App\Modules\System\Admin\RoleAssignableRule;
 use Pin\Action\Action;
@@ -12,38 +13,39 @@ use Pin\Captcha\Rule;
 use Pin\Validation\Rules\Unique;
 
 /**
- * 管理员创建和更新动作共享的验证规则。
+ * 管理员写入操作
  */
 class AdminAction extends Action
 {
-    public function __construct(protected AdminService $service)
+    public function __construct(protected AdminService $service = new AdminService())
     {
     }
 
     /**
-     * 管理员创建和更新共享的基础验证规则。
+     * 基础验证规则
      */
     protected function basicRules(): array
     {
         return [
             // 用户名
             'username' => [
+                'bail',
                 'required',
                 'string',
                 'unique' => new Unique(Admin::class)->ignore(
-                    (int) $this->context->get('id')
+                    (int) $this->context('id')
                 ),
             ],
 
             // 姓名
-            'realname' => 'required|fake:firstname',
+            'realname' => 'required|string|fake:firstname',
 
             /**
              * 密码（加密传输）
              *
              * @example plain:123456
              */
-            'password' => 'required|fake:password',
+            'password' => 'required|string|fake:password',
 
             /**
              * 验证码验证规则
@@ -51,8 +53,10 @@ class AdminAction extends Action
              * @example rev
              */
             'captcha_rule' => [
+                'bail',
                 'nullable',
-                fn ($attribute, $value) => Rule::parse($value),
+                'string',
+                static fn ($attribute, $value) => Rule::parse($value),
                 'fake:in,normal,rev',
             ],
 
@@ -67,13 +71,15 @@ class AdminAction extends Action
     }
 
     /**
-     * 从写入数据中剥离角色字段，超级管理员不允许通过表单重设角色。
+     * 提取角色 ID
      */
-    protected function extractRoleIds(array &$data, bool $isSuper = false): array
+    protected function extractRoleIds(array &$data): array
     {
         $roleIds = $data['roles'] ?? [];
         unset($data['roles']);
 
-        return $isSuper ? [] : $roleIds;
+        return in_array(Role::SUPER_ROLE_ID, $roleIds)
+            ? [Role::SUPER_ROLE_ID]
+            : array_values(array_unique($roleIds));
     }
 }

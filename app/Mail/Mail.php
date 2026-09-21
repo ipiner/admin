@@ -13,16 +13,23 @@ use Pin\Log\ExtraProcessor;
 use Throwable;
 
 /**
- * 将异常日志渲染为邮件内容并发送给系统收件人。
+ * 异常通知邮件
+ *
+ * @phpstan-consistent-constructor
  */
 class Mail extends Mailable
 {
+    /**
+     * @param  array<string, mixed>  $log  日志内容
+     */
     public function __construct(public array $log)
     {
     }
 
     /**
-     * 根据异常构造邮件日志上下文。
+     * 构造异常邮件
+     *
+     * @param  array<string, mixed>  $info  日志补充信息
      */
     public static function fromThrowable(Throwable $e, array $info = []): static
     {
@@ -32,7 +39,7 @@ class Mail extends Mailable
             'context' => [
                 'exception' => [
                     'code' => $e->getCode(),
-                    'class' => get_class($e),
+                    'class' => $e::class,
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                     'trace' => $e->getTraceAsString(),
@@ -45,10 +52,15 @@ class Mail extends Mailable
     }
 
     /**
-     * 按运行环境决定是否立即发送或队列发送异常邮件。
+     * 发送异常邮件
+     *
+     * @param  array<string, mixed>  $info  日志补充信息
      */
-    public static function sendByThrowable(Throwable $e, array $info = [], bool $queue = true): static|false
-    {
+    public static function sendByThrowable(
+        Throwable $e,
+        array $info = [],
+        bool $queue = true
+    ): self|false {
         if (app()->hasDebugModeEnabled()) {
             return false;
         }
@@ -60,18 +72,20 @@ class Mail extends Mailable
             Str::limit($e->getMessage(), 30)
         ));
 
-        Mailer::send($mail);
+        if ($queue) {
+            Mailer::queue($mail);
+        } else {
+            Mailer::sendNow($mail);
+        }
 
         return $mail;
     }
 
     /**
-     * Build the message.
+     * 邮件正文
      */
     public function content(): Content
     {
-        return new Content()
-            ->with('subject', $this->subject)
-            ->view('emails.email');
+        return new Content(view: 'emails.email', with: ['subject' => $this->subject]);
     }
 }

@@ -9,32 +9,30 @@ use Pin\Errors\Errors;
 use Pin\Exceptions\Exception;
 
 /**
- * 管理员守卫
- *
- * 管理员业务相关的权限约束和特殊管理员保护逻辑
+ * 管理员操作权限
  */
 class AdminGuard
 {
     /**
-     * 管理员是否允许被更新
+     * 检查修改权限
      *
      * @throws Exception
      */
-    public static function ensureUpdatable(Admin $model): void
+    public static function ensureUpdatable(Admin $admin): void
     {
-        if ($model->isAdministrator() && ! auth()->user()->isAdministrator()) {
+        if ($admin->isAdministrator() && ! auth()->user()->isAdministrator()) {
             throw Errors::UpdateFailed->exception('禁止修改该管理员')->withStatusCode(403);
         }
     }
 
     /**
-     * 管理员是否允许被删除
+     * 检查删除权限
      *
      * @throws Exception
      */
-    public static function ensureDeletable(Admin $model): void
+    public static function ensureDeletable(Admin $admin): void
     {
-        if ($model->isAdministrator()) {
+        if ($admin->isAdministrator()) {
             throw Errors::DeleteFailed->exception('禁止删除该管理员')->withStatusCode(403);
         }
     }

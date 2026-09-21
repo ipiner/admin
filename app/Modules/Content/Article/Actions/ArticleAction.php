@@ -14,19 +14,19 @@ use Pin\Faker\Fake;
 use Pin\Validation\Rules\Unique;
 
 /**
- * 文章创建和更新动作共享的验证规则。
+ * 文章创建和更新动作共享的验证规则
  */
 class ArticleAction extends Action
 {
     /**
-     * 注入文章写入服务。
+     * 注入文章写入服务
      */
     public function __construct(protected ArticleService $service)
     {
     }
 
     /**
-     * 文章创建和更新共享的基础验证规则。
+     * 文章创建和更新共享的基础验证规则
      */
     protected function basicRules(): array
     {

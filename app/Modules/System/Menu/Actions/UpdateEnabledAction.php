@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Modules\System\Menu\Actions;
 
+use Override;
+
 /**
- * 仅更新菜单启用状态。
+ * 更新启用状态
  */
 class UpdateEnabledAction extends UpdateMenuAction
 {
     /**
-     * 仅允许提交启用状态和版本号。
+     * 状态验证规则
      */
+    #[Override]
     public function rules(): array
     {
         return [
@@ -20,7 +23,7 @@ class UpdateEnabledAction extends UpdateMenuAction
              *
              * @example 1
              */
-            'enabled' => $this->basicRules()['enabled'],
+            'enabled' => 'required|'.$this->enabledRules(),
 
             // 数据版本号
             'v' => 'required|integer',

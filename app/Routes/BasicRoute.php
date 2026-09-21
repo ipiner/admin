@@ -6,10 +6,12 @@ namespace App\Routes;
 
 use App\Http\Controllers\IndexController;
 use Illuminate\Support\Facades\Route;
+use Override;
+use Pin\Route\Attributes\Handler;
 use Pin\Route\Routable;
 
 /**
- * 基础公共接口路由定义
+ * 基础路由
  */
 enum BasicRoute: string implements Routable
 {
@@ -18,17 +20,15 @@ enum BasicRoute: string implements Routable
     /**
      * 获取 CSRF Token
      */
+    #[Handler([IndexController::class, 'csrf'])]
     case Csrf = 'GET:/api/csrf';
 
     /**
-     * 注册路由
-     *
-     * 该组路由无需认证即可访问
+     * 注册公共路由
      */
+    #[Override]
     public static function registerRoutes(): void
     {
-        Route::withoutMiddleware('auth')->group(function () {
-            self::Csrf->register([IndexController::class, 'csrf']);
-        });
+        Route::withoutMiddleware('auth')->group(self::addRoutes(...));
     }
 }

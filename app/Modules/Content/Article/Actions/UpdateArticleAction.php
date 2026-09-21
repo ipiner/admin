@@ -7,12 +7,12 @@ namespace App\Modules\Content\Article\Actions;
 use Pin\Services\Results\UpdateResult;
 
 /**
- * 更新文章主体字段。
+ * 更新文章主体字段
  */
 class UpdateArticleAction extends ArticleAction
 {
     /**
-     * 执行文章更新流程。
+     * 执行文章更新流程
      */
     public function handle(int $id): UpdateResult
     {
@@ -20,7 +20,7 @@ class UpdateArticleAction extends ArticleAction
     }
 
     /**
-     * 更新文章主体字段的验证规则。
+     * 更新文章主体字段的验证规则
      */
     public function rules(): array
     {

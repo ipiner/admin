@@ -25,13 +25,22 @@ class ValidationController extends Controller
      */
     public function password(Request $request): ApiResponse
     {
+        $passwordRules = is_string($request->input('password'))
+            ? [new PasswordRule()->requiredCharacterTypes(2)]
+            : [];
+
         $this->validate($request, [
             /**
              * 密码（加密传输）
              *
              * @example plain:123456
              */
-            'password' => ['required', new PasswordRule()->requiredCharacterTypes(2)],
+            'password' => [
+                'bail',
+                'required',
+                'string',
+                ...$passwordRules,
+            ],
         ]);
 
         return $this->success();

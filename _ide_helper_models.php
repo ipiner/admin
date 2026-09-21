@@ -13,7 +13,7 @@
 
 namespace App\Models{
 /**
- * 后台模型基类，统一接入操作日志和隐藏删除字段。
+ * 后台模型基类，统一接入操作日志和隐藏删除字段
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Model newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Model newQuery()
@@ -26,7 +26,7 @@ namespace App\Models{
 
 namespace App\Models\System{
 /**
- * 后台管理员账号模型。
+ * 后台管理员账号模型
  *
  * @property int $id id|自增
  * @property string $username 用户名
@@ -72,7 +72,7 @@ namespace App\Models\System{
 
 namespace App\Models\System{
 /**
- * 后台菜单树模型。
+ * 后台菜单树模型
  *
  * @property int $id id|由id生成器生成
  * @property int $pid 父id|menus.id
@@ -174,7 +174,7 @@ namespace App\Models\System{
 
 namespace App\Models{
 /**
- * 上传文件主表模型。
+ * 上传文件主表模型
  *
  * @property int $id id|自增
  * @property string $file_id 文件uuid

@@ -3,8 +3,11 @@
 declare(strict_types=1);
 
 use App\Models\System\Admin;
+use App\Models\System\Menu;
 use App\Routes\AccountRoute;
 use Database\Factories\System\AdminFactory;
+use Database\Factories\System\MenuFactory;
+use Database\Factories\System\RoleFactory;
 use Illuminate\Http\UploadedFile;
 use Pin\Errors\Errors;
 use Pin\Support\Facades\Password;
@@ -22,6 +25,27 @@ describe('profile', function () {
         $data = AccountRoute::Profile->testJson($this, ['menus' => 1])->json('data');
 
         expect($data['menus'])->not()->toBeNull();
+    });
+
+    it('fetches role-limited account profile with menus', function () {
+        $menu = MenuFactory::new()->create([
+            'pid' => 0,
+            'type' => Menu::MENU,
+            'enabled' => 1,
+            'visible' => 1,
+        ]);
+        $role = RoleFactory::new()->create();
+        $role->menus()->attach($menu);
+
+        $admin = AdminFactory::new()->create();
+        $admin->roles()->attach($role);
+        $this->withAuth($admin);
+
+        $data = AccountRoute::Profile->testJson($this, ['menus' => 1])->json('data');
+        $menuIds = collect($data['menus'])->pluck('id')->all();
+
+        expect($data['has_all_access'])->toBeFalse()
+            ->and($menuIds)->toContain($menu->id);
     });
 });
 
@@ -75,15 +99,15 @@ describe('update avatar', function () {
     });
 });
 
-it(updates('profile'), function ($avatar) {
-    $payload = ['realname' => uniqid(), 'avatar' => $avatar];
+it(updates('profile'), function () {
+    $admin = AdminFactory::testingAdmin();
+    $avatar = (string) $admin->avatar;
+    $payload = ['realname' => uniqid()];
+
     AccountRoute::UpdateProfile->testJson($this, $payload)
         ->assertUpdated();
 
-    expect(AdminFactory::testingAdmin())
+    expect($admin->refresh())
         ->realname->toBe($payload['realname'])
-        ->avatar->toBe((string) $payload['avatar']);
-})->with([
-    'empty avatar' => null,
-    'has avatar' => 'http://www.'.uniqid().'.com',
-]);
+        ->avatar->toBe($avatar);
+});

@@ -10,14 +10,12 @@ use Pin\Errors\Errors;
 use Pin\Exceptions\Exception;
 
 /**
- * 菜单守卫
- *
- * 菜单业务相关的权限约束和特殊菜单保护逻辑
+ * 菜单操作权限
  */
 class MenuGuard
 {
     /**
-     * 是否允许删除
+     * 检查删除权限
      *
      * @throws Exception
      */
@@ -29,7 +27,7 @@ class MenuGuard
     }
 
     /**
-     * 是否允许变更启用状态
+     * 检查启用状态变更
      *
      * @throws Exception
      */
@@ -42,7 +40,7 @@ class MenuGuard
         // 指定菜单不可禁用
         if (
             $nextEnabled === Menu::DISABLED
-            && in_array($menu->code, static::enabledAlways())
+            && in_array($menu->code, static::alwaysEnabledCodes(), true)
         ) {
             Errors::UpdateFailed->throw("[{$menu->name}] 不可禁用");
         }
@@ -57,9 +55,11 @@ class MenuGuard
     }
 
     /**
-     * 返回系统强制保持启用的菜单编码。
+     * 不可禁用的菜单编码
+     *
+     * @return list<string>
      */
-    private static function enabledAlways(): array
+    protected static function alwaysEnabledCodes(): array
     {
         return [MenuRoute::Index->name()];
     }

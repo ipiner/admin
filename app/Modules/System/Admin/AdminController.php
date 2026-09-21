@@ -18,7 +18,7 @@ use Pin\Scramble\Deleted;
 use Pin\Scramble\Updated;
 
 /**
- * 管理员账号管理接口。
+ * 管理员管理
  */
 #[Group('系统 / 管理员')]
 class AdminController extends Controller
@@ -51,15 +51,14 @@ class AdminController extends Controller
      */
     public function index(Request $request): ApiResponse
     {
-        $rules = [
+        $request->validate([
             /**
              * 关键字，支持查询 `id` / `用户名` / `姓名`
              *
              * @example 1 / admin / 系统管理员
              */
             'q' => 'nullable|string',
-        ];
-        $request->validate($rules);
+        ]);
         $data = Admin::orderBy('id')->queryable(['q' => 'ns:id|username|realname'])
             ->with('roles')
             ->pagination()

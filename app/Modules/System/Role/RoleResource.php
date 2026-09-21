@@ -9,9 +9,10 @@ use App\Models\System\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
+use Override;
 
 /**
- * 角色列表响应资源。
+ * 角色资料
  *
  * @mixin Role
  */
@@ -23,37 +24,36 @@ class RoleResource extends JsonResource
     public $resource;
 
     /**
-     * 为角色列表补充超级角色标识和已关联菜单路径。
+     * 转换响应数据
      */
+    #[Override]
     public function toArray(Request $request): array
     {
         return array_merge(
             parent::toArray($request),
             [
                 'super' => $this->isSuperRole(),
-                'menus' => $this->menus(),
+                'menus' => $this->menuOptions(),
             ],
         );
     }
 
     /**
-     * 将角色关联菜单整理为前端权限树可消费的结构。
+     * 菜单选项
+     *
+     * @return Collection<int, array{id: int, name: string, paths: int[]}>
      */
-    private function menus(): Collection
+    protected function menuOptions(): Collection
     {
-        return $this->resource->menus->map(fn (Menu $item) => [
+        return $this->resource->menus->map(static fn (Menu $menu): array => [
             // 菜单id
-            'id' => $item->id,
+            'id' => $menu->id,
 
             // 菜单名称
-            'name' => $item->name,
+            'name' => $menu->name,
 
-            /**
-             * 菜单路径
-             *
-             * @var int[]
-             */
-            'paths' => $item->paths(),
+            // 菜单路径
+            'paths' => $menu->paths(),
         ]);
     }
 }

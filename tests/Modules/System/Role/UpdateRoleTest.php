@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\System\Role;
 use App\Modules\System\Role\Actions\UpdateRoleAction;
 use App\Routes\System\RoleRoute;
+use Database\Factories\System\AdminFactory;
 use Database\Factories\System\MenuFactory;
 use Database\Factories\System\RoleFactory;
 
@@ -23,6 +24,21 @@ describe('menus', function () {
                     ->and($roles[0])->toBe($menu->id);
             }
         );
+    });
+
+    it('flushes access for role members when syncing menus', function () {
+        $role = RoleFactory::new()->create();
+        AdminFactory::new()->create()->roles()->attach($role);
+
+        $menu = MenuFactory::new()->create();
+
+        RoleRoute::Update->testing($this)
+            ->withPayload(UpdateRoleAction::fake(['menus' => [$menu->id]]))
+            ->updated(
+                $role,
+                fn (Role $role) => expect($role->menus()->get()->pluck('id')->all())
+                    ->toBe([$menu->id])
+            );
     });
 
     it('does not sync menus for super role', function () {
