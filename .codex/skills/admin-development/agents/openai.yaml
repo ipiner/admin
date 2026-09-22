@@ -1,0 +1,4 @@
+interface:
+  display_name: "Admin Development"
+  short_description: "在基于 Pin 的 Admin 应用中开发业务模块和 API"
+  default_prompt: "使用 $admin-development 按 Pin 优先和 Admin 模块约定实现或修改功能。"
