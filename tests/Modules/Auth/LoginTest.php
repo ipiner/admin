@@ -53,7 +53,7 @@ describe('login', function () {
         LoginRoute::Login->testJson(
             $this,
             LoginAction::fake(['username' => $admin->username])
-        )->assertCode(App\Errors\Errors::LoginFailed);
+        )->assertCode(App\Errors\Errors::LoginAccountDisabled);
     });
 
     it('logins successfully', function () {

@@ -55,7 +55,11 @@ class LoginAction extends Action
         }
 
         if ($admin->isDisabled()) {
-            return $this->failLogin($admin, Errors::LoginDisabled);
+            return $this->failLogin(
+                $admin,
+                Errors::LoginAccountDisabled->code(),
+                Errors::LoginAccountDisabled->message(),
+            );
         }
 
         if (! Password::check($data['password'], $admin->salt, $admin->password)) {
