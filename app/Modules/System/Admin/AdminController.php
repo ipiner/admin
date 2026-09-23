@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\System\Admin;
 use App\Modules\System\Admin\Actions\CreateAdminAction;
 use App\Modules\System\Admin\Actions\UpdateAdminAction;
+use App\Modules\System\Admin\Actions\UpdateEnabledAction;
 use App\Modules\Upload\UploadService;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
@@ -74,6 +75,17 @@ class AdminController extends Controller
      * @return ApiResponse<Updated>
      */
     public function update(UpdateAdminAction $action, int $id): ApiResponse
+    {
+        return $this->success($action->handle($id));
+    }
+
+    /**
+     * 更新管理员启用状态
+     *
+     * @param  int  $id  管理员id
+     * @return ApiResponse<Updated>
+     */
+    public function updateEnabled(UpdateEnabledAction $action, int $id): ApiResponse
     {
         return $this->success($action->handle($id));
     }

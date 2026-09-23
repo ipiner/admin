@@ -62,6 +62,14 @@ describe('roles', function () {
     });
 });
 
+it('uses the enabled default when create payload contains a status', function () {
+    AdminRoute::Create->testing($this)
+        ->withPayload(CreateAdminAction::fake(['enabled' => Admin::DISABLED]))
+        ->created(
+            fn (Admin $admin) => expect($admin->enabled)->toBe(Admin::ENABLED),
+        );
+});
+
 it(validatesCreateRequired('admin'), function () {
     AdminRoute::Create->testJson($this)
         ->assertCode(422, 422)

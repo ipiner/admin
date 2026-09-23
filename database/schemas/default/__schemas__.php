@@ -216,6 +216,18 @@ return [
                 'comment' => '用户名',
                 'label' => '用户名',
             ],
+            'enabled' => [
+                'name' => 'enabled',
+                'type_name' => 'tinyint',
+                'type' => 'tinyint unsigned',
+                'nullable' => false,
+                'default' => '1',
+                'auto_increment' => false,
+                'collation' => null,
+                'generation' => null,
+                'comment' => '启用|0: 否; 1: 是',
+                'label' => '启用',
+            ],
             'realname' => [
                 'name' => 'realname',
                 'type_name' => 'varchar',

@@ -22,6 +22,7 @@ class AdminFactory extends Factory
     public function definition(): array
     {
         return CreateAdminAction::fake([
+            'enabled' => Admin::ENABLED,
             'password' => Password::encode('test@123'),
             'captcha_rule' => Arr::random(['', 'rev', 'normal']),
         ]);

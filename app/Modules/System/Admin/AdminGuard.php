@@ -26,6 +26,22 @@ class AdminGuard
     }
 
     /**
+     * 检查启用状态变更
+     *
+     * @throws Exception
+     */
+    public static function ensureEnabledStatusChangeAllowed(
+        Admin $admin,
+        ?int $nextEnabled,
+    ): void {
+        if ($nextEnabled !== Admin::DISABLED || ! $admin->isAdministrator()) {
+            return;
+        }
+
+        Errors::UpdateFailed->throw('禁止停用超级管理员');
+    }
+
+    /**
      * 检查删除权限
      *
      * @throws Exception

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\System\Admin;
 use App\Modules\Auth\LoginAction;
 use App\Routes\Auth\LoginRoute;
 use Database\Factories\System\AdminFactory;
@@ -44,6 +45,15 @@ describe('login', function () {
             ])
         )
             ->assertCode(App\Errors\Errors::LoginFailed);
+    });
+
+    it('fails to login when admin is disabled', function () {
+        $admin = AdminFactory::new()->create(['enabled' => Admin::DISABLED]);
+
+        LoginRoute::Login->testJson(
+            $this,
+            LoginAction::fake(['username' => $admin->username])
+        )->assertCode(App\Errors\Errors::LoginFailed);
     });
 
     it('logins successfully', function () {

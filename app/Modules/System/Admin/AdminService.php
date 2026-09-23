@@ -22,6 +22,10 @@ class AdminService extends ModelService
     protected function updating($model, array &$data): void
     {
         AdminGuard::ensureUpdatable($model);
+        AdminGuard::ensureEnabledStatusChangeAllowed(
+            $model,
+            isset($data['enabled']) ? (int) $data['enabled'] : null
+        );
         parent::updating($model, $data);
     }
 

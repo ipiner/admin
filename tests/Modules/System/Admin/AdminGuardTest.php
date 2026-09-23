@@ -21,6 +21,21 @@ describe('update admin', function () {
         AdminGuard::ensureUpdatable($admin);
         expect(true)->toBeTrue();
     });
+
+    it('forbids disabling super admin', function () {
+        AdminGuard::ensureEnabledStatusChangeAllowed(
+            new Admin(['id' => Admin::ADMINISTRATOR_ID]),
+            Admin::DISABLED,
+        );
+    })->throws(Exception::class, '禁止停用超级管理员', Errors::UpdateFailed->code());
+
+    it('allows enabling super admin', function () {
+        AdminGuard::ensureEnabledStatusChangeAllowed(
+            new Admin(['id' => Admin::ADMINISTRATOR_ID]),
+            Admin::ENABLED,
+        );
+        expect(true)->toBeTrue();
+    });
 });
 
 it('forbids deleting super admin', function () {

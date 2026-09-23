@@ -5,11 +5,13 @@ declare(strict_types=1);
 use App\Models\System\Admin;
 use App\Models\System\Role;
 use App\Modules\System\Admin\Actions\UpdateAdminAction;
+use App\Modules\System\Admin\Actions\UpdateEnabledAction;
 use App\Routes\System\AdminRoute;
 use Database\Factories\System\AdminFactory;
 use Database\Factories\System\RoleFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use Pin\Errors\Errors;
 use Pin\Support\Facades\Password;
 
 describe('password', function () {
@@ -37,6 +39,46 @@ describe('password', function () {
             fn (Admin $admin) => expect($admin->password)->toBe($oldPassword),
         );
     });
+});
+
+it('updates enabled status', function () {
+    $admin = AdminFactory::new()->create();
+    $role = RoleFactory::testingRole();
+    $admin->roles()->attach($role);
+
+    AdminRoute::UpdateEnabled->testing($this)
+        ->withRouteParams(['id' => $admin->id])
+        ->withPayload(UpdateEnabledAction::fake(['enabled' => Admin::DISABLED]))
+        ->updated(
+            $admin,
+            function (Admin $admin) use ($role) {
+                expect($admin->enabled)->toBe(Admin::DISABLED)
+                    ->and($admin->roles()->pluck('roles.id')->all())->toBe([$role->id]);
+            }
+        );
+});
+
+it('does not update enabled status through profile update', function () {
+    $admin = AdminFactory::new()->create(['enabled' => Admin::ENABLED]);
+
+    AdminRoute::Update->testing($this)
+        ->withRouteParams(['id' => $admin->id])
+        ->withPayload(UpdateAdminAction::fake(['enabled' => Admin::DISABLED]))
+        ->updated(
+            $admin,
+            fn (Admin $admin) => expect($admin->enabled)->toBe(Admin::ENABLED),
+        );
+});
+
+it('forbids disabling super admin', function () {
+    $admin = Admin::findOrFail(Admin::ADMINISTRATOR_ID);
+    $this->withAuth($admin);
+
+    AdminRoute::UpdateEnabled->testing($this)
+        ->withRouteParams(['id' => $admin->id])
+        ->json(UpdateEnabledAction::fake(['enabled' => Admin::DISABLED]))
+        ->assertMessage('禁止停用超级管理员')
+        ->assertCode(Errors::UpdateFailed->code());
 });
 
 describe('roles', function () {
@@ -77,7 +119,9 @@ describe('roles', function () {
         expect($admin->roles()->get())->toBeEmpty();
         $role = RoleFactory::testingRole();
         AdminRoute::Update->testing($this->withAuth(Admin::ADMINISTRATOR_ID))->withPayload(
-            UpdateAdminAction::fake(['roles' => [$role->id, Role::SUPER_ROLE_ID]])
+            UpdateAdminAction::fake([
+                'roles' => [$role->id, Role::SUPER_ROLE_ID],
+            ])
         )->updated(
             $admin,
             fn (Admin $admin) => expect($admin->roles()->get())->toBeEmpty()

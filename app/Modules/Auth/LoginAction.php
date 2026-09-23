@@ -54,6 +54,10 @@ class LoginAction extends Action
             );
         }
 
+        if ($admin->isDisabled()) {
+            return $this->failLogin($admin, Errors::LoginDisabled);
+        }
+
         if (! Password::check($data['password'], $admin->salt, $admin->password)) {
             return $this->failLogin($admin, Errors::LoginPasswordMismatch);
         }

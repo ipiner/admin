@@ -30,6 +30,7 @@ namespace App\Models\System{
  *
  * @property int $id id|自增
  * @property string $username 用户名
+ * @property int $enabled 启用|0: 否; 1: 是
  * @property string $realname 姓名
  * @property string $password 密码
  * @property string $salt 加密盐值
@@ -52,6 +53,7 @@ namespace App\Models\System{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereCaptchaRule($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereEnabled($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereLastLoginAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereLastLoginIp($value)

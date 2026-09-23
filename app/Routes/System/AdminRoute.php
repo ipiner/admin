@@ -30,6 +30,9 @@ enum AdminRoute: string implements Routable
     #[Middleware(DecodePassword::class)]
     case Update = 'PUT:/api/system/admins/{id}';
 
+    #[Title('更新管理员启用状态')]
+    case UpdateEnabled = 'PUT:/api/system/admins/{id}/enabled';
+
     #[Title('删除管理员')]
     case Delete = 'DELETE:/api/system/admins/{id}';
 

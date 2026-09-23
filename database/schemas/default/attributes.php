@@ -21,6 +21,7 @@ return [
     'admins' => [
         'id' => 'id',
         'username' => '用户名',
+        'enabled' => '启用',
         'realname' => '姓名',
         'password' => '密码',
         'salt' => '加密盐值',

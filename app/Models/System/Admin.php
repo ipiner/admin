@@ -24,6 +24,7 @@ use Pin\Support\Facades\Password;
 /**
  * 管理员
  *
+ * @property int $enabled 是否启用
  * @property-read ModelCollection<int, Role> $roles
  *
  * @mixin IdeHelperAdmin
@@ -34,6 +35,16 @@ class Admin extends Model implements AccessUser, AuthorizableContract, CanResetP
     use CacheAll, SoftDeletes;
 
     public const int ADMINISTRATOR_ID = 1;
+
+    /**
+     * 禁用
+     */
+    public const int DISABLED = 0;
+
+    /**
+     * 启用
+     */
+    public const int ENABLED = 1;
 
     /**
      * @var list<string>
@@ -90,6 +101,14 @@ class Admin extends Model implements AccessUser, AuthorizableContract, CanResetP
     public function isAdministrator(): bool
     {
         return $this->id === static::ADMINISTRATOR_ID;
+    }
+
+    /**
+     * 是否禁用
+     */
+    public function isDisabled(): bool
+    {
+        return $this->enabled === static::DISABLED;
     }
 
     /**
