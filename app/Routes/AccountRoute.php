@@ -9,6 +9,7 @@ use Pin\Route\Attributes\Middleware;
 use Pin\Route\Attributes\Name;
 use Pin\Route\Attributes\Title;
 use Pin\Route\Routable;
+use Pin\Validation\Middleware\ValidatePassword;
 
 /**
  * 账号路由
@@ -21,6 +22,7 @@ enum AccountRoute: string implements Routable
     case Profile = 'GET:/api/account/profile';
 
     #[Title('修改密码')]
+    #[Middleware(ValidatePassword::class)]
     case UpdatePassword = 'PUT:/api/account/password';
 
     #[Title('更新头像')]

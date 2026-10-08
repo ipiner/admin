@@ -11,13 +11,12 @@ use Database\Factories\System\AdminFactory;
 use Database\Factories\System\RoleFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Pin\Errors\Errors;
 
 describe('password', function () {
     it('updates password', function () {
         $admin = AdminFactory::testingAdmin();
-        $plain = Str::random();
+        $plain = 'new@1234';
 
         AdminRoute::Update->testing($this)->withPayload(
             UpdateAdminAction::fake(['username' => $admin->username, 'password' => $plain])
@@ -37,6 +36,14 @@ describe('password', function () {
             $admin,
             fn (Admin $admin) => expect($admin->password)->toBe($oldPassword),
         );
+    });
+    it('validates non-empty password rule', function () {
+        $admin = AdminFactory::testingAdmin();
+
+        AdminRoute::Update->testing($this)
+            ->withRouteParams(['id' => $admin->id])
+            ->json(UpdateAdminAction::fake(['password' => 'testtest']))
+            ->assertInvalid('password');
     });
 });
 

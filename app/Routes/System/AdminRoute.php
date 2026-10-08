@@ -10,6 +10,7 @@ use Pin\Route\Attributes\Middleware;
 use Pin\Route\Attributes\Name;
 use Pin\Route\Attributes\Title;
 use Pin\Route\Routable;
+use Pin\Validation\Middleware\ValidatePassword;
 
 /**
  * 管理员路由
@@ -22,9 +23,11 @@ enum AdminRoute: string implements Routable
     case Index = 'GET:/api/system/admins';
 
     #[Title('新增管理员')]
+    #[Middleware(ValidatePassword::class)]
     case Create = 'POST:/api/system/admins';
 
     #[Title('编辑管理员')]
+    #[Middleware(ValidatePassword::class)]
     case Update = 'PUT:/api/system/admins/{id}';
 
     #[Title('更新管理员启用状态')]

@@ -55,10 +55,21 @@ describe('update password', function () {
         AccountRoute::UpdatePassword->testJson(
             $this,
             [
-                'password' => '45678',
+                'password' => 'new@1234',
                 'current_password' => '123456',
             ]
         )->assertUpdated();
+    });
+    it('validates non-empty password rule', function () {
+        $admin = AdminFactory::new()->create(['password' => '123456']);
+        $this->withAuth($admin);
+        AccountRoute::UpdatePassword->testJson(
+            $this,
+            [
+                'password' => 'testtest',
+                'current_password' => '123456',
+            ]
+        )->assertInvalid('password');
     });
     it('fails to update password with wrong current password', function () {
         $admin = AdminFactory::testingAdmin();
@@ -66,7 +77,7 @@ describe('update password', function () {
         AccountRoute::UpdatePassword->testJson(
             $this,
             [
-                'password' => uniqid(),
+                'password' => 'new@1234',
                 'current_password' => uniqid(),
             ]
         )

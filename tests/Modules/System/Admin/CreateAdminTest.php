@@ -76,6 +76,12 @@ it(validatesCreateRequired('admin'), function () {
         ->assertInvalid(['username', 'password']);
 });
 
+it('validates password rule', function () {
+    AdminRoute::Create->testing($this)
+        ->json(CreateAdminAction::fake(['password' => 'testtest']))
+        ->assertInvalid('password');
+});
+
 it(ensuresUnique('admin', 'username'), function () {
     AdminRoute::Create->testing($this)
         ->json(CreateAdminAction::fake(['username' => AdminFactory::testingAdmin()->username]))

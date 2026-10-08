@@ -41,7 +41,7 @@ class AdminAction extends Action
             'realname' => 'required|string|fake:firstname',
 
             // 密码
-            'password' => 'required|string|fake:string,8',
+            'password' => 'required|string|fake:in,test@123',
 
             /**
              * 验证码验证规则
