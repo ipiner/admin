@@ -83,7 +83,7 @@ return [
         'enabled' => '启用',
         'visible' => '是否显示',
         'icon' => 'icon图标',
-        'route' => '前端路由地址',
+        'url' => '菜单地址',
         'v' => '数据版本号',
         'created_at' => '创建时间',
         'updated_at' => '更新时间',

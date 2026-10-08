@@ -58,7 +58,7 @@ class AccountMenu implements Arrayable, JsonSerializable
              * @example [3, 17, 32]
              */
             'paths' => $this->menu['paths'],
-            'route' => $this->menu['route'],
+            'url' => $this->menu['url'],
         ];
     }
 }

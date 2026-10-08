@@ -24,14 +24,14 @@ class MenuSeeder extends Seeder
 
     protected function create(array $data, array $pids): void
     {
-        $route = $data['route'] ?? '';
-        if ($route instanceof Routable) {
+        $routable = $data['url'] ?? null;
+        if ($routable instanceof Routable) {
             $data = [
-                'name' => $route->title(),
-                'code' => $route->name(),
-                'type' => $route->method() === 'GET' ? Menu::MENU : Menu::BUTTON,
+                'name' => $routable->title(),
+                'code' => $routable->name(),
+                'type' => $routable->method() === 'GET' ? Menu::MENU : Menu::BUTTON,
                 ...$data,
-                'route' => str_replace('/api', '', $route->uri()),
+                'url' => str_replace('/api', '', $routable->uri()),
             ];
         }
 
@@ -58,7 +58,7 @@ class MenuSeeder extends Seeder
     {
         foreach ($data as $item) {
             $this->create(
-                $item instanceof Routable ? ['route' => $item] : $item,
+                $item instanceof Routable ? ['url' => $item] : $item,
                 $pids,
             );
         }

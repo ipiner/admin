@@ -15,11 +15,11 @@ trait HasContentMenus
             'name' => '内容',
             'code' => 'content',
             'icon' => 'ant-design:appstore-outlined',
-            'route' => '/content',
+            'url' => '/content',
             'children' => [
                 [
                     'icon' => 'ant-design:file-text-outlined',
-                    'route' => ArticleRoute::Index,
+                    'url' => ArticleRoute::Index,
                     'children' => [
                         ArticleRoute::Update,
                         ArticleRoute::Delete,
@@ -27,7 +27,7 @@ trait HasContentMenus
                 ],
                 [
                     'icon' => 'ant-design:folder-outlined',
-                    'route' => ArticleCategoryRoute::Index,
+                    'url' => ArticleCategoryRoute::Index,
                     'children' => [
                         ArticleCategoryRoute::Update,
                         ArticleCategoryRoute::Delete,

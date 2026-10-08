@@ -22,7 +22,7 @@ class Menu extends \Pin\Access\Models\Menu
     public const int SYSTEM_ENABLED = 2;
 
     /**
-     * 清除按钮路由
+     * 清除按钮菜单地址
      */
     #[Override]
     protected function onSaving(): void
@@ -30,7 +30,7 @@ class Menu extends \Pin\Access\Models\Menu
         parent::onSaving();
 
         if ($this->type === static::BUTTON) {
-            $this->route = '';
+            $this->url = '';
         }
     }
 }

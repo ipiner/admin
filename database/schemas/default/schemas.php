@@ -892,17 +892,17 @@ return [
                 'comment' => 'icon图标',
                 'label' => 'icon图标',
             ],
-            'route' => [
-                'name' => 'route',
+            'url' => [
+                'name' => 'url',
                 'type_name' => 'varchar',
-                'type' => 'varchar(45)',
+                'type' => 'varchar(255)',
                 'nullable' => false,
                 'default' => '',
                 'auto_increment' => false,
                 'collation' => 'utf8mb4_0900_ai_ci',
                 'generation' => null,
-                'comment' => '前端路由地址',
-                'label' => '前端路由地址',
+                'comment' => '菜单地址',
+                'label' => '菜单地址',
             ],
             'v' => [
                 'name' => 'v',

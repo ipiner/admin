@@ -16,7 +16,7 @@ trait HasSystemMenus
         return [
             'name' => '管理员',
             'icon' => 'ant-design:user-outlined',
-            'route' => AdminRoute::Index,
+            'url' => AdminRoute::Index,
         ];
     }
 
@@ -26,23 +26,23 @@ trait HasSystemMenus
             'name' => '日志',
             'code' => 'system.log',
             'icon' => 'ant-design:security-scan-filled',
-            'route' => '/system/log',
+            'url' => '/system/log',
             'children' => [
                 [
                     'icon' => 'ant-design:login-outlined',
-                    'route' => \Pin\Modules\Log\LogRoute::LoginLog,
+                    'url' => \Pin\Modules\Log\LogRoute::LoginLog,
                 ],
                 [
                     'icon' => 'ant-design:console-sql-outlined',
-                    'route' => \Pin\Modules\Log\LogRoute::OperationLog,
+                    'url' => \Pin\Modules\Log\LogRoute::OperationLog,
                 ],
                 [
                     'icon' => 'ant-design:upload-outlined',
-                    'route' => LogRoute::UploadLog,
+                    'url' => LogRoute::UploadLog,
                 ],
                 [
                     'icon' => 'ant-design:audit-outlined',
-                    'route' => \Pin\Modules\Log\LogRoute::ActivityLog,
+                    'url' => \Pin\Modules\Log\LogRoute::ActivityLog,
                 ],
             ],
         ];
@@ -54,7 +54,7 @@ trait HasSystemMenus
             'name' => '菜单',
             'enabled' => 2,
             'icon' => 'ant-design:unordered-list-outlined',
-            'route' => MenuRoute::Index,
+            'url' => MenuRoute::Index,
         ];
     }
 
@@ -63,7 +63,7 @@ trait HasSystemMenus
         return [
             'name' => '角色',
             'icon' => 'ant-design:team-outlined',
-            'route' => RoleRoute::Index,
+            'url' => RoleRoute::Index,
         ];
     }
 
@@ -73,7 +73,7 @@ trait HasSystemMenus
             'name' => '系统',
             'code' => 'system',
             'icon' => 'ant-design:setting-outlined',
-            'route' => '/system',
+            'url' => '/system',
             'children' => [
                 $this->role(),
                 $this->admin(),

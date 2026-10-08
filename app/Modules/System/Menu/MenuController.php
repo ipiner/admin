@@ -68,8 +68,8 @@ class MenuController extends Controller
             // 菜单编码
             'code' => QueryableRules::like(),
 
-            // 前端路由
-            'route' => QueryableRules::like(),
+            // 菜单地址
+            'url' => QueryableRules::like(),
         ];
         $request->validate($rules);
         $paging = $request->boolean('paging');

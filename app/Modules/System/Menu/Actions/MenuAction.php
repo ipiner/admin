@@ -63,14 +63,27 @@ class MenuAction extends Action
             // 菜单图标
             'icon' => 'nullable|string|max:45',
 
-            // 前端路由，以 `/` 开头
-            'route' => [
+            // 菜单地址，支持内部路径或外部地址
+            'url' => [
                 'bail',
                 'required_if:type,'.Menu::MENU,
                 'nullable',
                 'string',
-                'max:45',
-                'starts_with:/',
+                'max:255',
+                static function ($attribute, $value, $fail): void {
+                    if (str_starts_with($value, '/')) {
+                        return;
+                    }
+
+                    $scheme = strtolower((string) parse_url($value, PHP_URL_SCHEME));
+                    if (in_array($scheme, ['http', 'https'], true)
+                        && filter_var($value, FILTER_VALIDATE_URL)
+                    ) {
+                        return;
+                    }
+
+                    $fail('菜单地址格式不正确');
+                },
                 new Unique(Menu::class)->ignore($id),
                 Fake::make(static fn () => '/'.Str::random()),
             ],

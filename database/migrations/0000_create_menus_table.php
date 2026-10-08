@@ -23,7 +23,7 @@ return new class extends Migration
             $this->unsignedTinyInteger('enabled', '启用|0: 否; 1: 是; 2: 是且不能禁用')->default(1);
             $this->unsignedTinyInteger('visible', '是否显示|0: 否; 1: 是')->default(1);
             $this->string('icon', 'icon图标', 45, true);
-            $this->string('route', '前端路由地址', 45, true);
+            $this->string('url', '菜单地址', 255, true);
             $this->version();
             $this->timestamps();
             $this->deleted();
