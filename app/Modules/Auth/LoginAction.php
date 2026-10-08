@@ -9,6 +9,7 @@ use App\Events\LoginFailed;
 use App\Events\LoginSucceeded;
 use App\Models\System\Admin;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Validator;
 use Override;
@@ -17,7 +18,6 @@ use Pin\Captcha\Captcha;
 use Pin\Errors\IError;
 use Pin\Exceptions\ValidationException;
 use Pin\Faker\Fake;
-use Pin\Support\Facades\Password;
 use Throwable;
 
 /**
@@ -62,7 +62,7 @@ class LoginAction extends Action
             );
         }
 
-        if (! Password::check($data['password'], $admin->salt, $admin->password)) {
+        if (! Hash::check($data['password'], $admin->password)) {
             return $this->failLogin($admin, Errors::LoginPasswordMismatch);
         }
 
@@ -189,12 +189,11 @@ class LoginAction extends Action
             // 用户名
             'username' => 'required|string',
 
-            /**
-             * 密码（加密传输）
-             *
-             * @example plain:123456
-             */
-            'password' => 'required|string|fake:password',
+            'password' => [
+                'required',
+                'string',
+                Fake::make(static fn () => 'test@123'),
+            ],
             /**
              * 验证码，格式 `input|token`
              *

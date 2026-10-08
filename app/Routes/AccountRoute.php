@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Routes;
 
 use App\Modules\Upload\UploadMiddleware;
-use Pin\Password\Middleware\DecodePassword;
 use Pin\Route\Attributes\Middleware;
 use Pin\Route\Attributes\Name;
 use Pin\Route\Attributes\Title;
@@ -22,7 +21,6 @@ enum AccountRoute: string implements Routable
     case Profile = 'GET:/api/account/profile';
 
     #[Title('修改密码')]
-    #[Middleware(DecodePassword::class)]
     case UpdatePassword = 'PUT:/api/account/password';
 
     #[Title('更新头像')]

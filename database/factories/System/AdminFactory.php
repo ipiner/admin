@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Pin\Support\Facades\Password;
 
 /**
  * @extends Factory<Admin>
@@ -23,7 +22,7 @@ class AdminFactory extends Factory
     {
         return CreateAdminAction::fake([
             'enabled' => Admin::ENABLED,
-            'password' => Password::encode('test@123'),
+            'password' => 'test@123',
             'captcha_rule' => Arr::random(['', 'rev', 'normal']),
         ]);
     }

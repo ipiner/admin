@@ -14,12 +14,11 @@ use Illuminate\Database\Eloquent\Collection as ModelCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use Override;
 use Pin\Access\Contracts\AccessUser;
 use Pin\Models\Concerns\CacheAll;
 use Pin\Models\Concerns\SoftDeletes;
-use Pin\Support\Facades\Password;
 
 /**
  * 管理员
@@ -49,7 +48,7 @@ class Admin extends Model implements AccessUser, AuthorizableContract, CanResetP
     /**
      * @var list<string>
      */
-    protected $hidden = ['password', 'salt', 'role_id'];
+    protected $hidden = ['password', 'role_id'];
 
     /**
      * 获取可访问菜单
@@ -92,7 +91,7 @@ class Admin extends Model implements AccessUser, AuthorizableContract, CanResetP
      */
     public function hashPassword(?string $password = null): string
     {
-        return Password::hash($password ?? $this->password, $this->salt);
+        return Hash::make($password ?? $this->password);
     }
 
     /**
@@ -129,7 +128,6 @@ class Admin extends Model implements AccessUser, AuthorizableContract, CanResetP
     {
         parent::onCreating();
 
-        $this->salt ??= Str::random(8);
         $this->password = $this->hashPassword($this->password);
     }
 

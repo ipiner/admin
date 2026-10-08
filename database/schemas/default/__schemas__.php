@@ -252,18 +252,6 @@ return [
                 'comment' => '密码',
                 'label' => '密码',
             ],
-            'salt' => [
-                'name' => 'salt',
-                'type_name' => 'varchar',
-                'type' => 'varchar(8)',
-                'nullable' => false,
-                'default' => null,
-                'auto_increment' => false,
-                'collation' => 'utf8mb4_0900_ai_ci',
-                'generation' => null,
-                'comment' => '加密盐值',
-                'label' => '加密盐值',
-            ],
             'avatar' => [
                 'name' => 'avatar',
                 'type_name' => 'varchar',

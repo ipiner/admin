@@ -6,7 +6,6 @@ namespace Database\Seeders\System;
 
 use App\Models\System\Admin;
 use Illuminate\Database\Seeder;
-use Pin\Support\Facades\Password;
 
 class AdminSeeder extends Seeder
 {
@@ -21,7 +20,7 @@ class AdminSeeder extends Seeder
             'id' => Admin::ADMINISTRATOR_ID,
             'username' => 'admin',
             'realname' => '系统管理员',
-            'password' => Password::encode('test@123'),
+            'password' => 'test@123',
         ]);
     }
 }

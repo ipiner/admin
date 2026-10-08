@@ -10,7 +10,6 @@ use Database\Factories\System\MenuFactory;
 use Database\Factories\System\RoleFactory;
 use Illuminate\Http\UploadedFile;
 use Pin\Errors\Errors;
-use Pin\Support\Facades\Password;
 
 describe('profile', function () {
     it('fetches account profile without menus', function () {
@@ -51,13 +50,13 @@ describe('profile', function () {
 
 describe('update password', function () {
     it(updates('password'), function () {
-        $admin = AdminFactory::new()->create(['password' => Password::encode('123456')]);
+        $admin = AdminFactory::new()->create(['password' => '123456']);
         $this->withAuth($admin);
         AccountRoute::UpdatePassword->testJson(
             $this,
             [
-                'password' => Password::encodeToRequest('45678'),
-                'current_password' => Password::encodeToRequest('123456'),
+                'password' => '45678',
+                'current_password' => '123456',
             ]
         )->assertUpdated();
     });
@@ -67,8 +66,8 @@ describe('update password', function () {
         AccountRoute::UpdatePassword->testJson(
             $this,
             [
-                'password' => Password::encodeToRequest(uniqid()),
-                'current_password' => Password::encodeToRequest(uniqid()),
+                'password' => uniqid(),
+                'current_password' => uniqid(),
             ]
         )
             ->assertCode(Errors::UpdateFailed)

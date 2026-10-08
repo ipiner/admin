@@ -10,12 +10,12 @@ use App\Modules\Upload\UploadService;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Pin\Access\Facades\Access;
 use Pin\Errors\Errors;
 use Pin\Http\ApiResponse;
 use Pin\Scramble\Updated;
 use Pin\Services\Results\UpdateResult;
-use Pin\Support\Facades\Password;
 
 /**
  * 账号管理
@@ -54,24 +54,16 @@ class AccountController extends Controller
     {
         $data = $request->validate(
             [
-                /**
-                 * 当前密码（加密传输）
-                 *
-                 * @example plain:123456
-                 */
+                // 当前密码
                 'current_password' => 'required|string',
 
-                /**
-                 * 新密码（加密传输）
-                 *
-                 * @example plain:123456
-                 */
+                // 新密码
                 'password' => 'required|string',
             ],
             [],
             ['password' => '新密码']
         );
-        if (! Password::check($data['current_password'], $account->salt, $account->password)) {
+        if (! Hash::check($data['current_password'], $account->password)) {
             Errors::UpdateFailed->throw('当前密码错误');
         }
         $updated = $account->update([

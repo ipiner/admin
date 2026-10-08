@@ -29,3 +29,4 @@ config/config.local.php
 /public/uploads
 composer.lock
 .phpstorm.meta.php
+_ide_helper*

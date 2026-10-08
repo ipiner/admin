@@ -7,7 +7,7 @@ namespace App\Http\Controllers;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
 use Pin\Http\ApiResponse;
-use Pin\Password\PasswordRule;
+use Pin\Validation\Rules\Password;
 
 #[Group('验证')]
 class ValidationController extends Controller
@@ -26,15 +26,11 @@ class ValidationController extends Controller
     public function password(Request $request): ApiResponse
     {
         $passwordRules = is_string($request->input('password'))
-            ? [new PasswordRule()->requiredCharacterTypes(2)]
+            ? [new Password()->requiredCharacterTypes(2)]
             : [];
 
         $this->validate($request, [
-            /**
-             * 密码（加密传输）
-             *
-             * @example plain:123456
-             */
+            // 密码
             'password' => [
                 'bail',
                 'required',

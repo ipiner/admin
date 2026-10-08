@@ -24,7 +24,6 @@ return [
         'enabled' => '启用',
         'realname' => '姓名',
         'password' => '密码',
-        'salt' => '加密盐值',
         'avatar' => '头像',
         'captcha_rule' => '验证码规则',
         'login_num' => '登录次数',

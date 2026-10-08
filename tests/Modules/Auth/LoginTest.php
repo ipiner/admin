@@ -8,7 +8,6 @@ use App\Routes\Auth\LoginRoute;
 use Database\Factories\System\AdminFactory;
 use Pin\Auth\Auth;
 use Pin\Captcha\Errors;
-use Pin\Support\Facades\Password;
 
 describe('login', function () {
     it('fails to login with required fields', function () {
@@ -40,7 +39,7 @@ describe('login', function () {
         LoginRoute::Login->testJson(
             $this,
             LoginAction::fake([
-                'password' => Password::encodeToRequest('45678'),
+                'password' => '45678',
                 'username' => AdminFactory::testingAdmin()->username,
             ])
         )

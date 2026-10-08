@@ -53,8 +53,8 @@ class UpdateAdminAction extends AdminAction
         return [
             ...$this->basicRules(),
 
-            // 密码（加密传输），不修改密码留空
-            'password' => 'nullable|string|fake:password',
+            // 密码，不修改密码留空
+            'password' => 'nullable|string|fake:string,8',
 
             // 数据版本号
             'v' => 'required|integer',

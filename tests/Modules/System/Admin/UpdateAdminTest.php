@@ -10,22 +10,21 @@ use App\Routes\System\AdminRoute;
 use Database\Factories\System\AdminFactory;
 use Database\Factories\System\RoleFactory;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Pin\Errors\Errors;
-use Pin\Support\Facades\Password;
 
 describe('password', function () {
     it('updates password', function () {
         $admin = AdminFactory::testingAdmin();
         $plain = Str::random();
-        $password = Password::encodeToRequest($plain);
 
         AdminRoute::Update->testing($this)->withPayload(
-            UpdateAdminAction::fake(['username' => $admin->username, 'password' => $password])
+            UpdateAdminAction::fake(['username' => $admin->username, 'password' => $plain])
         )->updated(
             $admin,
             fn (Admin $admin) => expect(
-                Password::check(Password::encode($plain), $admin->salt, $admin->password)
+                Hash::check($plain, $admin->password)
             )->toBeTrue()
         );
     });

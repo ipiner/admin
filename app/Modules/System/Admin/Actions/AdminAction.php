@@ -40,12 +40,8 @@ class AdminAction extends Action
             // 姓名
             'realname' => 'required|string|fake:firstname',
 
-            /**
-             * 密码（加密传输）
-             *
-             * @example plain:123456
-             */
-            'password' => 'required|string|fake:password',
+            // 密码
+            'password' => 'required|string|fake:string,8',
 
             /**
              * 验证码验证规则

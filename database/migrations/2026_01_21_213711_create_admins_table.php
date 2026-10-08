@@ -16,7 +16,7 @@ return new class extends Migration
             $this->string('username', '用户名', 30);
             $this->string('realname', '姓名', 30);
             $this->string('password', '密码');
-            $this->string('salt', '加密盐值', 8);
+            $this->unsignedTinyInteger('enabled', '启用|0: 否; 1: 是')->default(1);
             $this->string('avatar', '头像', null, true);
             $this->string('captcha_rule', '验证码规则', 30, true);
             $this->unsignedSmallInteger('login_num', '登录次数')->default(0);
