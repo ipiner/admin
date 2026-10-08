@@ -24,9 +24,6 @@ class UpdateVisibleAction extends UpdateMenuAction
              * @example 1
              */
             'visible' => 'required|'.$this->visibleRules(),
-
-            // 数据版本号
-            'v' => 'required|integer',
         ];
     }
 }

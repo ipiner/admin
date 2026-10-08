@@ -24,9 +24,6 @@ class UpdateEnabledAction extends UpdateMenuAction
              * @example 1
              */
             'enabled' => 'required|'.$this->enabledRules(),
-
-            // 数据版本号
-            'v' => 'required|integer',
         ];
     }
 }

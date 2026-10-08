@@ -15,7 +15,6 @@ return new class extends Migration
             $this->id();
             $this->string('name', '角色名称', 30);
             $this->string('remark', '备注', 100, true);
-            $this->version();
             $this->timestamps();
             $this->deleted();
 

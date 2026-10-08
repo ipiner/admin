@@ -22,7 +22,6 @@ return new class extends Migration
             $this->unsignedSmallInteger('login_num', '登录次数')->default(0);
             $this->timestamp('last_login_at', '最后登录时间');
             $this->string('last_login_ip', '最后登录ip', 15, true);
-            $this->version();
             $this->timestamps();
             $this->deleted();
 

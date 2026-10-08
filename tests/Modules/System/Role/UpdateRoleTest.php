@@ -47,7 +47,7 @@ describe('menus', function () {
         $menu = MenuFactory::testingMenu();
         RoleRoute::Update->testing($this->withAuth(Role::SUPER_ROLE_ID))
             ->withPayload(
-                UpdateRoleAction::fake(['menus' => [$menu->id], 'v' => 1])
+                UpdateRoleAction::fake(['menus' => [$menu->id]])
             )
             ->updated(
                 $role,

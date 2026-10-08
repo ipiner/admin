@@ -36,9 +36,6 @@ class UpdateRoleAction extends RoleAction
     {
         return [
             ...$this->basicRules(),
-
-            // 数据版本号
-            'v' => 'required|integer',
         ];
     }
 

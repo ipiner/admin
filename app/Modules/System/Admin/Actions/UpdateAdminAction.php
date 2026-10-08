@@ -55,9 +55,6 @@ class UpdateAdminAction extends AdminAction
 
             // 密码，不修改密码留空
             'password' => 'nullable|string|fake:in,test@123',
-
-            // 数据版本号
-            'v' => 'required|integer',
         ];
     }
 

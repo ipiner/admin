@@ -16,7 +16,6 @@ return new class extends Migration
             $this->unsignedInteger('category_id', '分类id|article_categories.id')->default(0)->index();
             $this->string('title', '标题');
             $table->text('content')->comment('内容');
-            $this->version();
             $this->blameable();
             $this->timestamps();
             $this->deleted();
@@ -32,7 +31,6 @@ return new class extends Migration
             $this->string('path', '分类路径|...父父id,父id,id', 100)->unique();
             $this->unsignedTinyInteger('level', '层级')->default(1);
             $this->unsignedInteger('sort', '排序');
-            $this->version();
             $this->blameable();
             $this->timestamps();
             $this->deleted();

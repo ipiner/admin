@@ -24,7 +24,6 @@ return new class extends Migration
             $this->unsignedTinyInteger('visible', '是否显示|0: 否; 1: 是')->default(1);
             $this->string('icon', 'icon图标', 45, true);
             $this->string('url', '菜单地址', 255, true);
-            $this->version();
             $this->timestamps();
             $this->deleted();
 

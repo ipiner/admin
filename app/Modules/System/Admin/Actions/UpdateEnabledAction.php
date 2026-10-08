@@ -33,9 +33,6 @@ class UpdateEnabledAction extends UpdateAdminAction
              * @example 1
              */
             'enabled' => 'required|integer|in:0,1|',
-
-            // 数据版本号
-            'v' => 'required|integer',
         ];
     }
 }

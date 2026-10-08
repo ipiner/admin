@@ -26,8 +26,6 @@ class UpdateArticleAction extends ArticleAction
     {
         return [
             ...$this->basicRules(),
-            // 数据版本号
-            'v' => 'required|integer',
         ];
     }
 }
