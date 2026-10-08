@@ -7,7 +7,7 @@ use Pin\Errors\Errors;
 use Pin\Errors\IError;
 
 it('validates passwords', function (IError $error, string $value) {
-    ValidationRoute::Password->testJson($this, ['password' => 'plain:'.$value])
+    ValidationRoute::Password->testJson($this, ['password' => $value])
         ->assertStatus($error === Errors::None ? 200 : 422)
         ->assertJsonPath('code', $error->code());
 })->with([

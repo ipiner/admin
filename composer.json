@@ -6,11 +6,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.5",
-        "ipiner/access": "^1.0",
-        "ipiner/captcha": "^1.0",
-        "ipiner/modules-log": "^1.0",
-        "ipiner/pin": "^1.0",
-        "ipiner/upload": "^1.0",
+        "ipiner/access": "dev-main",
+        "ipiner/captcha": "dev-main",
+        "ipiner/modules-log": "dev-main",
+        "ipiner/pin": "dev-main",
+        "ipiner/upload": "dev-main",
+        "laravel/octane": "^2.19",
         "laravel/tinker": "^3.0"
     },
     "require-dev": {
