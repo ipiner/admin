@@ -48,7 +48,7 @@ class AdminGuard
      */
     public static function ensureDeletable(Admin $admin): void
     {
-        if ($admin->isAdministrator()) {
+        if (! $admin->isDeletable()) {
             throw Errors::DeleteFailed->exception('禁止删除该管理员')->withStatusCode(403);
         }
     }

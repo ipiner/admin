@@ -103,6 +103,14 @@ class Admin extends Model implements AccessUser, AuthorizableContract, CanResetP
     }
 
     /**
+     * 是否允许删除
+     */
+    public function isDeletable(): bool
+    {
+        return ! $this->isAdministrator();
+    }
+
+    /**
      * 是否禁用
      */
     public function isDisabled(): bool

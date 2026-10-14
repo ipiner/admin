@@ -32,7 +32,8 @@ class RoleResource extends JsonResource
         return array_merge(
             parent::toArray($request),
             [
-                'super' => $this->isSuperRole(),
+                'is_super' => $this->isSuperRole(),
+                'deletable' => $this->isDeletable(),
                 'menus' => $this->menuOptions(),
             ],
         );

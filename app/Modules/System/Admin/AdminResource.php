@@ -34,7 +34,8 @@ class AdminResource extends JsonResource
                  * @var array{id: int, name: string}[]
                  */
                 'roles' => $this->roleOptions($hasAllAccess),
-                'super' => $this->isAdministrator(),
+                'is_super' => $this->isAdministrator(),
+                'deletable' => $this->isDeletable(),
                 'has_all_access' => $hasAllAccess,
             ]
         );

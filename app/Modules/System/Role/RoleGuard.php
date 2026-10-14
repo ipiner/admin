@@ -32,7 +32,7 @@ class RoleGuard
      */
     public static function ensureDeletable(Role $role): void
     {
-        if ($role->isSuperRole()) {
+        if (! $role->isDeletable()) {
             throw Errors::DeleteFailed->exception('禁止删除该角色')->withStatusCode(403);
         }
     }

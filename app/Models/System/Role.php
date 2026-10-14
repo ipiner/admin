@@ -32,6 +32,14 @@ class Role extends Model
     }
 
     /**
+     * 是否允许删除
+     */
+    public function isDeletable(): bool
+    {
+        return ! $this->isSuperRole();
+    }
+
+    /**
      * 关联菜单
      *
      * @return BelongsToMany<Menu, $this>
